@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Privacy Policy - Mridini</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Georgia', serif; color: #333; background-color: #fff; line-height: 1.6; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid #f0f0f0; }
+        .search-bar { flex: 1; display: flex; justify-content: flex-start; }
+        .search-bar input { padding: 10px 15px; border: 1px solid #ccc; border-radius: 20px; font-family: sans-serif; width: 250px; }
+        .logo-container { flex: 1; display: flex; justify-content: center; }
+        .logo-img { width: 100px; height: 100px; background-color: transparent; object-fit: contain; }
+        .header-icons { flex: 1; display: flex; justify-content: flex-end; gap: 15px; }
+        .icon-circle { width: 40px; height: 40px; border: 1px solid #ccc; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; position: relative; cursor: pointer;}
+        .cart-count { position: absolute; top: -5px; right: -5px; background-color: #a35d4d; color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: sans-serif; }
+        .main-nav { display: flex; justify-content: center; gap: 30px; padding: 15px 0; font-family: 'Georgia', serif; font-size: 15px; border-bottom: 1px solid #f0f0f0; }
+        .main-nav a:hover { color: #a35d4d; }
+        footer { border-top: 1px solid #eee; padding: 60px 40px 20px 40px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-top: 60px; }
+        .footer-brand .logo { text-align: left; margin-bottom: 20px; font-size: 24px; color: #a35d4d; letter-spacing: 4px; }
+        .footer-brand p { color: #555; font-size: 15px; max-width: 400px; }
+        .footer-column h4 { font-size: 18px; color: #333; margin-bottom: 20px; }
+        .footer-column ul li { margin-bottom: 12px; color: #555; font-size: 14px; cursor: pointer; }
+        .footer-column ul li:hover { color: #a35d4d; }
+        .footer-bottom { grid-column: 1 / -1; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 14px; color: #777; text-align: center;}
+        
+        .page-container { max-width: 800px; margin: 60px auto; padding: 0 20px; }
+        h1 { color: #a35d4d; text-align: center; margin-bottom: 40px; letter-spacing: 2px; font-weight: normal; }
+        h3 { color: #5a3c2b; margin-top: 30px; margin-bottom: 10px; font-weight: normal; }
+    </style>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+    <div class="page-container">
+        <h1>PRIVACY POLICY</h1>
+        <p>Mridini Emporium respects your privacy and is committed to protecting your personal data. This policy outlines how we handle your information.</p>
+        
+        <h3>Information We Collect</h3>
+        <p>When you make a purchase or create an account, we collect necessary information such as your name, billing address, shipping address, email address, and phone number to fulfill your order.</p>
+
+        <h3>How We Use Your Information</h3>
+        <p>We use your data solely to process transactions, communicate with you regarding your orders, and (if you opt-in) send you promotional offers. We do not sell, trade, or rent your personal identification information to others.</p>
+
+        <h3>Data Security</h3>
+        <p>We implement standard security measures to maintain the safety of your personal information. Payment processing is handled by secure third-party gateways; we do not store your credit card details on our servers.</p>
+    </div>
+    <div id="footer-placeholder"></div>
+    <script>
+        Promise.all([fetch('header.html').then(r => r.text()),fetch('footer.html').then(r => r.text())]).then(([h, f]) => { document.getElementById('header-placeholder').innerHTML = h; document.getElementById('footer-placeholder').innerHTML = f; const s = document.getElementById('global-search-input'); if (s) { s.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); const q = this.value.trim(); if (q) window.location.href = `shop.html?search=${encodeURIComponent(q)}`; } }); } const c = JSON.parse(localStorage.getItem('mridini_cart')) || []; const b = document.getElementById('global-cart-badge'); if (b) b.innerText = c.reduce((t, i) => t + i.qty, 0); fetch('/api/products').then(res => res.json()).then(products => { const cats = [...new Set(products.map(p => p.category))].filter(Boolean); const sh = cats.sort(() => 0.5 - Math.random()).slice(0, 4); const ul = document.getElementById('footer-dynamic-categories'); if (ul) ul.innerHTML = sh.length === 0 ? '<li><a href="shop.html">Shop All</a></li>' : sh.map(cat => `<li><a href="shop.html?category=${encodeURIComponent(cat)}">${cat}</a></li>`).join(''); }).catch(err => console.error(err)); });
+    </script>
+</body>
+</html>

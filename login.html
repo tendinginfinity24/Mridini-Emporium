@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account - MRIDINI</title>
+    <style>
+        body { font-family: 'Georgia', serif; margin: 0; padding: 0; background-color: #fafafa; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .auth-container { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 400px; text-align: center; }
+        .logo { font-size: 28px; color: #a35d4d; letter-spacing: 4px; margin-bottom: 30px; display: block; text-decoration: none; }
+        
+        .tabs { display: flex; margin-bottom: 30px; border-bottom: 1px solid #eee; }
+        .tab { flex: 1; padding: 10px; font-family: sans-serif; font-size: 14px; font-weight: bold; color: #777; cursor: pointer; transition: 0.3s; }
+        .tab.active { color: #a35d4d; border-bottom: 2px solid #a35d4d; }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; font-family: sans-serif; font-size: 12px; color: #555; margin-bottom: 5px; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: sans-serif; font-size: 14px; }
+        .form-input:focus { outline: 1px solid #a35d4d; }
+        
+        .btn-auth { width: 100%; padding: 15px; background-color: #333; color: white; border: none; font-weight: bold; font-family: sans-serif; cursor: pointer; letter-spacing: 1px; border-radius: 4px; transition: 0.2s; margin-top: 10px; }
+        .btn-auth:hover { background-color: #a35d4d; }
+        
+        .error-message { color: #d32f2f; font-family: sans-serif; font-size: 13px; margin-bottom: 15px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <a href="website.html" class="logo">Mridini Emporium</a>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('login')">SIGN IN</div>
+            <div class="tab" onclick="switchTab('register')">CREATE ACCOUNT</div>
+        </div>
+
+        <div id="error-box" class="error-message"></div>
+
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>Phone Number or Email</label>
+                <input type="text" id="login-identifier" class="form-input" required>
+            </div>
+            
+            <div class="form-group" style="position: relative;">
+                <label>Password</label>
+                <a href="#" onclick="showForgotForm()" style="position: absolute; right: 0; top: 0; font-family: sans-serif; font-size: 12px; color: #a35d4d; font-weight: bold; cursor: pointer; text-decoration: none;">Forgot?</a>
+                <input type="password" id="login-password" class="form-input" required>
+            </div>
+            
+            <button type="submit" class="btn-auth">SIGN IN</button>
+        </form>
+
+        <form id="register-form" style="display: none;" onsubmit="handleRegister(event)">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="reg-name" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="reg-phone" class="form-input" required pattern="[0-9]{10}" placeholder="10-digit mobile number">
+            </div>
+            <div class="form-group">
+                <label>Email Address (Optional)</label>
+                <input type="email" id="reg-email" class="form-input">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="reg-password" class="form-input" required minlength="6">
+            </div>
+            <button type="submit" class="btn-auth">CREATE ACCOUNT</button>
+        </form>
+
+
+
+        <div id="forgot-container" style="display: none;">
+            <div id="step-1-forgot">
+                <p style="font-family: sans-serif; font-size: 13px; color: #555; text-align: left; margin-bottom: 15px;">Enter your phone or email to receive a reset code.</p>
+                <input type="text" id="reset-identifier" class="form-input" placeholder="Phone Number or Email" style="margin-bottom: 10px;">
+                <button onclick="requestResetCode()" class="btn-auth">SEND CODE</button>
+                <div style="margin-top: 15px;"><a href="#" onclick="switchTab('login')" style="font-size: 12px; color: #777;">Back to Login</a></div>
+            </div>
+
+            <div id="step-2-forgot" style="display: none;">
+                <p style="font-family: sans-serif; font-size: 13px; color: #555; text-align: left; margin-bottom: 15px;">Enter the 6-digit code we sent you and your new password.</p>
+                <input type="text" id="reset-code" class="form-input" placeholder="6-Digit Code" style="margin-bottom: 10px;">
+                <input type="password" id="reset-new-password" class="form-input" placeholder="New Password" style="margin-bottom: 10px;">
+                <button onclick="submitNewPassword()" class="btn-auth">RESET PASSWORD</button>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.getElementById('error-box').style.display = 'none';
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('register-form').style.display = 'none';
+                document.querySelectorAll('.tab')[0].classList.add('active');
+            } else {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('register-form').style.display = 'block';
+                document.querySelectorAll('.tab')[1].classList.add('active');
+            }
+        }
+
+        function showError(message) {
+            const errorBox = document.getElementById('error-box');
+            errorBox.innerText = message;
+            errorBox.style.display = 'block';
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('reg-name').value,
+                phone: document.getElementById('reg-phone').value,
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-password').value
+            };
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+                });
+                const result = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('mridini_user', JSON.stringify(result.user));
+                    window.location.href = 'website.html'; 
+                } else {
+                    showError(result.message);
+                }
+            } catch (err) {
+                showError("Could not connect to server.");
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const data = {
+                identifier: document.getElementById('login-identifier').value,
+                password: document.getElementById('login-password').value
+            };
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+                });
+                const result = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('mridini_user', JSON.stringify(result.user));
+                    
+                    // The Redirect Logic for LOGGING IN
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get('returnTo') === 'checkout') {
+                        window.location.href = 'checkout.html';
+                    } else {
+                        window.location.href = 'website.html'; 
+                    }
+                } else {
+                    showError(result.message);
+                }
+            } catch (err) {
+                showError("Could not connect to server.");
+            }
+        }
+
+        function showForgotForm() {
+            document.getElementById('error-box').style.display = 'none';
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'none';
+            const oldLinkBox = document.getElementById('forgot-link-box');
+            if (oldLinkBox) oldLinkBox.style.display = 'none';
+            
+            document.getElementById('forgot-container').style.display = 'block';
+            document.getElementById('step-1-forgot').style.display = 'block';
+            document.getElementById('step-2-forgot').style.display = 'none';
+        }
+
+        async function requestResetCode() {
+            const identifier = document.getElementById('reset-identifier').value;
+            if(!identifier) return showError("Please enter your email or phone.");
+
+            try {
+                const res = await fetch('/api/forgot-password', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifier })
+                });
+                const result = await res.json();
+                
+                if(res.ok) {
+                    alert(result.message); // Tells you to check terminal!
+                    document.getElementById('step-1-forgot').style.display = 'none';
+                    document.getElementById('step-2-forgot').style.display = 'block';
+                }
+            } catch(err) { showError("Server error."); }
+        }
+
+        async function submitNewPassword() {
+            const identifier = document.getElementById('reset-identifier').value;
+            const code = document.getElementById('reset-code').value;
+            const newPassword = document.getElementById('reset-new-password').value;
+
+            if(!code || !newPassword) return showError("Please fill out all fields.");
+
+            try {
+                const res = await fetch('/api/reset-password', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ identifier, code, newPassword })
+                });
+                const result = await res.json();
+
+                if(res.ok) {
+                    alert("Success! Please log in with your new password.");
+                    switchTab('login'); // Send them back to the login screen!
+                } else {
+                    showError(result.message);
+                }
+            } catch(err) { showError("Server error."); }
+        }
+
+
+    </script>
+</body>
+</html>

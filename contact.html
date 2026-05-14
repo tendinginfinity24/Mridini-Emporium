@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Us - Mridini</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Georgia', serif; color: #333; background-color: #fff; line-height: 1.6; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid #f0f0f0; }
+        .search-bar { flex: 1; display: flex; justify-content: flex-start; }
+        .search-bar input { padding: 10px 15px; border: 1px solid #ccc; border-radius: 20px; font-family: sans-serif; width: 250px; }
+        .logo-container { flex: 1; display: flex; justify-content: center; }
+        .logo-img { width: 100px; height: 100px; background-color: transparent; object-fit: contain; }
+        .header-icons { flex: 1; display: flex; justify-content: flex-end; gap: 15px; }
+        .icon-circle { width: 40px; height: 40px; border: 1px solid #ccc; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; position: relative; cursor: pointer;}
+        .cart-count { position: absolute; top: -5px; right: -5px; background-color: #a35d4d; color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: sans-serif; }
+        .main-nav { display: flex; justify-content: center; gap: 30px; padding: 15px 0; font-family: 'Georgia', serif; font-size: 15px; border-bottom: 1px solid #f0f0f0; }
+        .main-nav a:hover { color: #a35d4d; }
+        footer { border-top: 1px solid #eee; padding: 60px 40px 20px 40px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-top: 60px; }
+        .footer-brand .logo { text-align: left; margin-bottom: 20px; font-size: 24px; color: #a35d4d; letter-spacing: 4px; }
+        .footer-brand p { color: #555; font-size: 15px; max-width: 400px; }
+        .footer-column h4 { font-size: 18px; color: #333; margin-bottom: 20px; }
+        .footer-column ul li { margin-bottom: 12px; color: #555; font-size: 14px; cursor: pointer; }
+        .footer-column ul li:hover { color: #a35d4d; }
+        .footer-bottom { grid-column: 1 / -1; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 14px; color: #777; text-align: center;}
+        
+        h1 { color: #a35d4d; letter-spacing: 2px; width: 100%; margin-bottom: 30px; text-align: center; font-weight: normal;}
+        .contact-container { max-width: 800px; margin: 40px auto; padding: 0 20px; display: flex; gap: 40px; }
+        .contact-info { flex: 1; }
+        .contact-form { flex: 1; background: #fafafa; padding: 30px; border: 1px solid #eee; }
+        input[type="text"], input[type="email"], textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; font-family: sans-serif; box-sizing: border-box; }
+        button { background: #333; color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-family: sans-serif; font-weight: bold; letter-spacing: 1px; transition: 0.3s;}
+        button:hover { background: #a35d4d; }
+    </style>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+    <div style="width: 100%; max-width: 800px; margin: 50px auto 0 auto;"><h1>GET IN TOUCH</h1></div>
+    <div class="contact-container">
+        <div class="contact-info">
+            <h3 style="color:#5a3c2b; margin-bottom:15px; font-weight: normal;">Customer Support</h3>
+            <p>Our dedicated team is here to assist you with styling advice, order tracking, and any other inquiries.</p>
+            <br>
+            <p><strong>Email:</strong> mridiniemporium@gmail.com</p>
+            <p><strong>Phone:</strong> +91 73872 83042</p>
+            <p><strong>Hours:</strong> Mon - Sat | 12:00 AM - 8:00 PM</p>
+            <p><strong>Visit us:</strong> Opp. Sindhi Sharamshala, Near Sut Market, Gandhibagh, Nagpur.</p>
+            <p><strong>Maps:</strong> <a href="https://maps.app.goo.gl/HWLckBVsQ5mYWvGK8" target="_blank" style="color: #a35d4d; text-decoration: underline;">View on Google Maps</a></p>
+        </div>
+        <div class="contact-form">
+            <form onsubmit="event.preventDefault(); alert('Message sent! Our team will get back to you within 24 hours.'); this.reset();">
+                <input type="text" placeholder="Your Name" required>
+                <input type="email" placeholder="Your Email" required>
+                <input type="text" placeholder="Order ID (Optional)">
+                <textarea rows="5" placeholder="How can we help you?" required></textarea>
+                <button type="submit">SEND MESSAGE</button>
+            </form>
+        </div>
+    </div>
+    <div id="footer-placeholder"></div>
+
+    <script>
+        Promise.all([
+            fetch('header.html').then(r => r.text()),
+            fetch('footer.html').then(r => r.text())
+        ]).then(([h, f]) => {
+            document.getElementById('header-placeholder').innerHTML = h;
+            document.getElementById('footer-placeholder').innerHTML = f;
+
+            const searchInput = document.getElementById('global-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const query = this.value.trim();
+                        if (query) window.location.href = `shop.html?search=${encodeURIComponent(query)}`;
+                    }
+                });
+            }
+
+            const cart = JSON.parse(localStorage.getItem('mridini_cart')) || [];
+            const badge = document.getElementById('global-cart-badge');
+            if (badge) badge.innerText = cart.reduce((total, item) => total + item.qty, 0);
+
+            fetch('/api/products').then(res => res.json()).then(products => {
+                const categories = [...new Set(products.map(p => p.category))].filter(Boolean);
+                const shuffled = categories.sort(() => 0.5 - Math.random()).slice(0, 4);
+                const ul = document.getElementById('footer-dynamic-categories');
+                if (ul) ul.innerHTML = shuffled.length === 0 ? '<li><a href="shop.html">Shop All</a></li>' : shuffled.map(cat => `<li><a href="shop.html?category=${encodeURIComponent(cat)}">${cat}</a></li>`).join('');
+            }).catch(err => console.error(err));
+        });
+    </script>
+</body>
+</html>

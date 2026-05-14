@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mridini Emporium</title>
+    <style>
+        /* Base Styles & Resets */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Georgia', serif; color: #333; background-color: #fff; line-height: 1.6; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* --- Header --- */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid #f0f0f0; }
+        .search-bar { flex: 1; display: flex; justify-content: flex-start; }
+        .search-bar input { padding: 10px 15px; border: 1px solid #ccc; border-radius: 20px; font-family: sans-serif; width: 250px; }
+        .logo-container { flex: 1; display: flex; justify-content: center; }
+        .logo-img { width: 100px; height: 100px; background-color: transparent; object-fit: contain; }
+        .header-icons { flex: 1; display: flex; justify-content: flex-end; gap: 15px; }
+        .icon-circle { width: 40px; height: 40px; border: 1px solid #ccc; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; position: relative; }
+        .cart-count { position: absolute; top: -5px; right: -5px; background-color: #a35d4d; color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: sans-serif; }
+        .main-nav { display: flex; justify-content: center; gap: 30px; padding: 15px 0; font-family: 'Georgia', serif; font-size: 15px; border-bottom: 1px solid #f0f0f0; }
+        .main-nav a:hover { color: #a35d4d; }
+
+        /* --- Hero Section --- */
+        .hero { display: flex; align-items: center; justify-content: flex-end; height: 500px; background-color: #e5ded2; background-image: url('hero.png'); background-size: cover; background-position: center; padding: 0 10%; }
+        .hero-content { text-align: center; color: #a35d4d; }
+        .hero-content h2 { font-size: 24px; font-weight: normal; letter-spacing: 2px; margin-bottom: 10px; }
+        .hero-content h1 { font-size: 80px; font-weight: normal; letter-spacing: 5px; margin-bottom: 10px; }
+        .hero-content p { font-size: 20px; margin-bottom: 25px; }
+        .shop-btn { padding: 12px 30px; background-color: transparent; border: 1px solid #a35d4d; color: #a35d4d; font-family: sans-serif; font-weight: bold; font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; }
+        .shop-btn:hover { background-color: #a35d4d; color: white; }
+
+        /* --- Categories Horizontal Slider --- */
+        /* --- Categories Horizontal Slider --- */
+        .categories-wrapper { position: relative; padding: 60px 40px; display: flex; align-items: center; }
+        .categories { display: flex; align-items: center; justify-content: center; gap: 40px; overflow-x: auto; scroll-behavior: smooth; padding-bottom: 15px; width: 100%; scrollbar-width: none; }
+        .categories::-webkit-scrollbar { display: none; }
+        
+        .category-item { display: flex; flex-direction: column; align-items: center; gap: 15px; cursor: pointer; flex-shrink: 0; transition: transform 0.2s;}
+        .category-item:hover { transform: scale(1.05); }
+        .category-img { width: 120px; height: 120px; border-radius: 50%; border: 3px solid #a35d4d; object-fit: cover; padding: 3px; background-color: #f4f4f4;}
+        .category-item span { font-size: 14px; color: #555; text-transform: capitalize; font-weight: bold; letter-spacing: 1px; }
+
+        /* --- Product Sections --- */
+        .section-title { text-align: center; font-size: 28px; color: #5a3c2b; letter-spacing: 3px; margin-bottom: 10px; margin-top: 20px; }
+        .section-subtitle { text-align: center; font-size: 14px; color: #666; margin-bottom: 40px; }
+        
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 0 40px 40px 40px; }
+        .product-card { display: flex; flex-direction: column; position: relative; cursor: pointer; transition: 0.2s;}
+        .product-card:hover { transform: translateY(-5px); }
+        .product-card img, .product-card video { width: 100%; height: 350px; object-fit: cover; background-color: #f4f4f4; margin-bottom: 15px; border-radius: 4px; }
+        .product-title { font-size: 14px; color: #333; margin-bottom: 5px; }
+        
+        .price-row { display: flex; gap: 8px; align-items: baseline; }
+        .scratched-price { text-decoration: line-through; color: #a0a0a0; font-size: 13px; }
+        .selling-price { color: #a35d4d; font-size: 14px; font-weight: bold; }
+        
+        .out-of-stock { position: absolute; top: 10px; right: 0; background-color: #d32f2f; color: white; font-family: sans-serif; font-size: 12px; padding: 5px 10px; font-weight: bold; z-index: 2;}
+        .view-all-container { text-align: center; margin-bottom: 60px; }
+        .view-all-btn { background-color: #b57a66; color: white; border: none; padding: 10px 25px; font-family: sans-serif; font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: 0.3s; }
+        .view-all-btn:hover { background-color: #a35d4d; }
+
+        /* --- Footer --- */
+        footer { border-top: 1px solid #eee; padding: 60px 40px 20px 40px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; }
+        .footer-brand .logo { text-align: left; margin-bottom: 20px; font-size: 24px; color: #a35d4d; letter-spacing: 4px; }
+        .footer-brand p { color: #555; font-size: 15px; max-width: 400px; }
+        .footer-column h4 { font-size: 18px; color: #333; margin-bottom: 20px; }
+        .footer-column ul li { margin-bottom: 12px; color: #555; font-size: 14px; cursor: pointer; }
+        .footer-column ul li:hover { color: #a35d4d; }
+        .footer-bottom { grid-column: 1 / -1; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 14px; color: #777; text-align: center;}
+    </style>
+</head>
+<body>
+
+    <header id="header-placeholder"></header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h2>END OF SEASON</h2>
+            <h1>SALE</h1>
+            <p>UPTO 40% OFF</p>
+            <a href="shop.html"><button class="shop-btn">SHOP NOW</button></a>
+        </div>
+    </section>
+
+    <div class="categories-wrapper">
+        <div class="categories" id="dynamic-categories">
+            </div>
+    </div>
+
+    <section>
+        <h2 class="section-title">NEW ARRIVALS</h2>
+        <p class="section-subtitle">Freshly added to the catalog</p>
+        <div class="product-grid" id="new-arrivals-grid"></div>
+        <div class="view-all-container"><a href="shop.html"><button class="view-all-btn">VIEW ALL NEW ARRIVALS</button></a></div>
+    </section>
+
+    <section>
+        <h2 class="section-title">BEST SELLERS</h2>
+        <p class="section-subtitle">Our most loved designs</p>
+        <div class="product-grid" id="best-sellers-grid"></div>
+    </section>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        // 1. Inject Layout
+        
+        // 2. The Main Engine
+        async function buildHomePage() {
+            try {
+                const response = await fetch('/api/products');
+                const allProducts = await response.json();
+
+                if(allProducts.length === 0) return;
+
+                // --- BUILD DYNAMIC CATEGORIES ---
+                const catContainer = document.getElementById('dynamic-categories');
+                catContainer.innerHTML = '';
+                
+                // Track unique categories and save the hero image for each
+                const categoryMap = {};
+                allProducts.forEach(p => {
+                    if (p.category && !categoryMap[p.category]) {
+                        // Find the safest first image
+                        let heroImg = "https://via.placeholder.com/150";
+                        if (p.media && p.media.length > 0 && p.media[0]) heroImg = p.media[0];
+                        else if (p.image) heroImg = p.image;
+                        
+                        categoryMap[p.category] = heroImg;
+                    }
+                });
+
+                // Render the circular icons
+                for (const [cat, imgUrl] of Object.entries(categoryMap)) {
+                    const cleanUrl = String(imgUrl);
+                    let mediaHtml = cleanUrl.toLowerCase().endsWith('.mp4') 
+                        ? `<video src="${cleanUrl}" autoplay loop muted playsinline class="category-img"></video>`
+                        : `<img src="${cleanUrl}" alt="${cat}" class="category-img">`;
+
+                    catContainer.innerHTML += `
+                        <a href="shop.html?category=${encodeURIComponent(cat)}" class="category-item">
+                            ${mediaHtml}
+                            <span>${cat}</span>
+                        </a>
+                    `;
+                }
+
+                // --- BUILD NEW ARRIVALS (Sorted by ID descending) ---
+                // Since ID is a timestamp, highest ID = Newest Product
+                const newArrivals = [...allProducts].sort((a, b) => b.id - a.id).slice(0, 4);
+                renderGrid('new-arrivals-grid', newArrivals);
+
+                // --- BUILD BEST SELLERS (Randomized Shuffle) ---
+                // Grabs 4 random products to act as a dynamic "Best Sellers" rotation
+                const bestSellers = [...allProducts].sort(() => 0.5 - Math.random()).slice(0, 4);
+                renderGrid('best-sellers-grid', bestSellers);
+
+            } catch (error) {
+                console.error("Failed to load home page data:", error);
+            }
+        }
+
+        // --- SHARED GRID RENDERER ---
+        function renderGrid(containerId, productsArray) {
+            const grid = document.getElementById(containerId);
+            grid.innerHTML = '';
+
+            productsArray.forEach(product => {
+                // Bulletproof Media Extraction
+                let primaryMediaUrl = "https://via.placeholder.com/300x400?text=No+Image";
+                if (product.media && Array.isArray(product.media) && product.media.length > 0 && product.media[0]) {
+                    primaryMediaUrl = product.media[0];
+                } else if (product.image) {
+                    primaryMediaUrl = product.image;
+                }
+
+                const safeUrlStr = String(primaryMediaUrl);
+                let mediaHtml = safeUrlStr.toLowerCase().endsWith('.mp4') 
+                    ? `<video src="${safeUrlStr}" autoplay loop muted playsinline></video>`
+                    : `<img src="${safeUrlStr}" alt="${product.name}">`;
+
+                // Safe Prices
+                const safeOrig = Number(product.originalPrice) || 0;
+                const safePrice = Number(product.price) || 0;
+                const stockBadge = product.inStock !== false ? '' : '<div class="out-of-stock">Out of Stock</div>';
+
+                let priceHtml = (safeOrig > safePrice)
+                    ? `<div class="price-row"><span class="scratched-price">₹${safeOrig.toFixed(2)}</span><span class="selling-price">₹${safePrice.toFixed(2)}</span></div>`
+                    : `<div class="selling-price" style="margin-top: 2px;">₹${safePrice.toFixed(2)}</div>`;
+
+                // Build the Clickable Card
+                const card = document.createElement('a');
+                card.href = `product.html?id=${product.id}`;
+                card.className = 'product-card';
+                card.innerHTML = `
+                    ${stockBadge}
+                    ${mediaHtml}
+                    <div class="product-title">${product.name || "Product"}</div>
+                    ${priceHtml}
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Fire it up
+        buildHomePage();
+    </script>
+
+    <script>
+        // Make logout available globally
+        window.logoutUser = function() {
+            localStorage.removeItem('mridini_user');
+            window.location.reload();
+        };
+
+        Promise.all([
+            fetch('header.html').then(r => r.text()),
+            fetch('footer.html').then(r => r.text())
+        ]).then(([h, f]) => {
+            document.getElementById('header-placeholder').innerHTML = h;
+            document.getElementById('footer-placeholder').innerHTML = f;
+
+            // 1. User Session Logic (THIS FIXES THE ICON!)
+            const userData = JSON.parse(localStorage.getItem('mridini_user'));
+            const userDisplay = document.getElementById('user-display');
+            const userNameSpan = document.getElementById('user-name');
+            const profileLink = document.getElementById('user-profile-link');
+
+            if (userData && userData.name && profileLink) {
+                if (userDisplay) userDisplay.style.display = 'inline';
+                if (userNameSpan) userNameSpan.innerText = userData.name.split(' ')[0];
+                profileLink.href = "account.html"; // Successfully routes logged-in users to account
+            }
+
+            // 2. Search Logic
+            const searchInput = document.getElementById('global-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const query = this.value.trim();
+                        if (query) window.location.href = `shop.html?search=${encodeURIComponent(query)}`;
+                    }
+                });
+            }
+
+            // 3. Cart Badge Logic
+            const cart = JSON.parse(localStorage.getItem('mridini_cart')) || [];
+            const badge = document.getElementById('global-cart-badge');
+            if (badge) badge.innerText = cart.reduce((total, item) => total + item.qty, 0);
+
+            // 4. Footer Categories Logic
+            fetch('/api/products').then(res => res.json()).then(products => {
+                const categories = [...new Set(products.map(p => p.category))].filter(Boolean);
+                const shuffled = categories.sort(() => 0.5 - Math.random()).slice(0, 4);
+                const ul = document.getElementById('footer-dynamic-categories');
+                if (ul) ul.innerHTML = shuffled.length === 0 ? '<li><a href="shop.html">Shop All</a></li>' 
+                    : shuffled.map(cat => `<li><a href="shop.html?category=${encodeURIComponent(cat)}">${cat}</a></li>`).join('');
+            }).catch(err => console.error(err));
+        });
+    </script>
+
+
+</body>
+</html>

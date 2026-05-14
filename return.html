@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Returns & Exchanges - Mridini</title>
+    <style>
+        /* Base Styles & Resets */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Georgia', serif; color: #333; background-color: #fff; line-height: 1.6; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* --- Header --- */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid #f0f0f0; }
+        .search-bar { flex: 1; display: flex; justify-content: flex-start; }
+        .search-bar input { padding: 10px 15px; border: 1px solid #ccc; border-radius: 20px; font-family: sans-serif; width: 250px; }
+        .logo-container { flex: 1; display: flex; justify-content: center; }
+        .logo-img { width: 100px; height: 100px; background-color: transparent; object-fit: contain; }
+        .header-icons { flex: 1; display: flex; justify-content: flex-end; gap: 15px; }
+        .icon-circle { width: 40px; height: 40px; border: 1px solid #ccc; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; position: relative; cursor: pointer;}
+        .cart-count { position: absolute; top: -5px; right: -5px; background-color: #a35d4d; color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: sans-serif; }
+        .main-nav { display: flex; justify-content: center; gap: 30px; padding: 15px 0; font-family: 'Georgia', serif; font-size: 15px; border-bottom: 1px solid #f0f0f0; }
+        .main-nav a:hover { color: #a35d4d; }
+
+        /* --- Footer --- */
+        footer { border-top: 1px solid #eee; padding: 60px 40px 20px 40px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-top: 60px; }
+        .footer-brand .logo { text-align: left; margin-bottom: 20px; font-size: 24px; color: #a35d4d; letter-spacing: 4px; }
+        .footer-brand p { color: #555; font-size: 15px; max-width: 400px; }
+        .footer-column h4 { font-size: 18px; color: #333; margin-bottom: 20px; }
+        .footer-column ul li { margin-bottom: 12px; color: #555; font-size: 14px; cursor: pointer; }
+        .footer-column ul li:hover { color: #a35d4d; }
+        .footer-bottom { grid-column: 1 / -1; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 14px; color: #777; text-align: center;}
+
+        /* --- Page Specific Styles --- */
+        .page-container { max-width: 800px; margin: 60px auto; padding: 0 20px; }
+        h1 { color: #a35d4d; text-align: center; margin-bottom: 40px; letter-spacing: 2px; font-weight: normal; }
+        h3 { color: #5a3c2b; margin-top: 30px; margin-bottom: 10px; font-weight: normal; }
+        .alert-box { background-color: #fcf4f4; border: 1px solid #f8b4b4; padding: 20px; border-radius: 4px; margin-bottom: 30px; color: #d32f2f; }
+    </style>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+    
+    <div class="page-container">
+        <h1>RETURN & EXCHANGE POLICY</h1>
+        
+        <div class="alert-box">
+            <strong>CRITICAL REQUIREMENT:</strong> To be eligible for any return, exchange, or damage claim, you <strong>must provide a continuous, unedited unboxing video</strong> from the moment the sealed package is opened. Claims without a valid unboxing video will be strictly rejected.
+        </div>
+
+        <h3>7-Day Return Window</h3>
+        <p>We want you to love your Mridini garments. If you are not completely satisfied, we accept returns and exchanges within <strong>7 days of receiving your order</strong>. The items must be unworn, unwashed, unaltered, and have all original tags and packaging intact.</p>
+
+        <h3>How to Initiate a Return</h3>
+        <p>1. Ensure you have your unboxing video ready.<br>
+           2. Navigate to your Account Orders or contact us directly at support@mridini.com.<br>
+           3. Provide your Order ID, the reason for return, and attach the unboxing video link.<br>
+           4. Once approved, our team will provide instructions for shipping the item back.</p>
+
+        <h3>Non-Returnable Items</h3>
+        <p>Custom-tailored outfits, sale items, and accessories (for hygiene reasons) are final sale and cannot be returned or exchanged unless explicitly defective upon arrival (verified via unboxing video).</p>
+
+        <h3>Refunds</h3>
+        <p>Once we receive and inspect your returned item, we will process your refund within 5-7 business days to your original method of payment. Shipping costs are non-refundable.</p>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        Promise.all([
+            fetch('header.html').then(r => r.text()),
+            fetch('footer.html').then(r => r.text())
+        ]).then(([h, f]) => {
+            document.getElementById('header-placeholder').innerHTML = h;
+            document.getElementById('footer-placeholder').innerHTML = f;
+
+            const searchInput = document.getElementById('global-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const query = this.value.trim();
+                        if (query) window.location.href = `shop.html?search=${encodeURIComponent(query)}`;
+                    }
+                });
+            }
+
+            const cart = JSON.parse(localStorage.getItem('mridini_cart')) || [];
+            const badge = document.getElementById('global-cart-badge');
+            if (badge) badge.innerText = cart.reduce((total, item) => total + item.qty, 0);
+
+            fetch('/api/products').then(res => res.json()).then(products => {
+                const categories = [...new Set(products.map(p => p.category))].filter(Boolean);
+                const shuffled = categories.sort(() => 0.5 - Math.random()).slice(0, 4);
+                const ul = document.getElementById('footer-dynamic-categories');
+                if (ul) ul.innerHTML = shuffled.length === 0 ? '<li><a href="shop.html">Shop All</a></li>' : shuffled.map(cat => `<li><a href="shop.html?category=${encodeURIComponent(cat)}">${cat}</a></li>`).join('');
+            }).catch(err => console.error(err));
+        });
+    </script>
+</body>
+</html>

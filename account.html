@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - Mridini Emporium</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Account Dashboard Specific Styles */
+        body { background: #fafafa; }
+        .account-wrapper { max-width: 1000px; margin: 50px auto; padding: 0 20px; }
+        .page-title { font-size: 32px; letter-spacing: 2px; margin-bottom: 30px; }
+        .dashboard-grid { display: flex; gap: 40px; align-items: flex-start; }
+        .profile-card { flex: 1; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .orders-card { flex: 2; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .order-row { border-bottom: 1px solid #eee; padding: 20px 0; font-family: sans-serif; font-size: 14px; }
+        .status-badge { background: #e5ded2; color: #a35d4d; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+        .cancel-btn { background-color: #d32f2f; color: white; border: none; padding: 8px 15px; font-size: 12px; border-radius: 4px; cursor: pointer; margin-top: 15px; transition: 0.2s;}
+        .cancel-btn:hover { background-color: #b71c1c; }
+
+        /* Cancellation Modal Styles */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-box { background: white; padding: 30px; border-radius: 8px; width: 400px; font-family: sans-serif; }
+        .modal-box h3 { margin-top: 0; color: #a35d4d; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+        .form-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit-cancel { width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .close-modal { text-align: center; margin-top: 15px; font-size: 13px; color: #777; cursor: pointer; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <header id="header-placeholder"></header>
+
+    <div class="account-wrapper">
+        <h1 class="page-title">MY ACCOUNT</h1>
+        
+        <div class="dashboard-grid">
+            <div class="profile-card">
+                <h3 style="margin-top:0;">Profile Details</h3>
+                <p id="user-name"><strong>Name:</strong> Loading...</p>
+                <p id="user-email"><strong>Email:</strong> Loading...</p>
+                <p id="user-phone"><strong>Phone:</strong> Loading...</p>
+                <button onclick="logout()" style="width:100%; padding:10px; background:#333; color:white; border:none; cursor:pointer; margin-top:20px; border-radius: 4px;">LOG OUT</button>
+            </div>
+
+            <div class="orders-card">
+                <h3 style="margin-top:0;">Order History</h3>
+                <div id="user-orders-list">Loading your orders...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="cancel-modal">
+        <div class="modal-box">
+            <h3 id="modal-title">Cancel Order</h3>
+            
+            <input type="hidden" id="cancel-order-id">
+            <input type="hidden" id="cancel-order-status">
+            
+            <div id="pre-delivery-view" style="display: none;">
+                <p style="font-size: 14px; color: #555; margin-bottom: 20px;">Are you sure you want to cancel this order? This action cannot be undone.</p>
+            </div>
+
+            <div id="post-delivery-view" style="display: none;">
+                <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Since this order was delivered, please provide a reason and upload an unboxing video to process your return request.</p>
+                
+                <div class="form-group">
+                    <label>Reason for Return *</label>
+                    <select id="cancel-reason" class="form-input">
+                        <option value="">Select a reason...</option>
+                        <option value="Damaged Item">Item arrived damaged</option>
+                        <option value="Wrong Item">Received the wrong item</option>
+                        <option value="Quality Issue">Quality not as expected</option>
+                        <option value="Changed Mind">Changed my mind</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Unboxing Video (Required) *</label>
+                    <input type="file" id="cancel-video" accept="video/mp4,video/x-m4v,video/*" class="form-input">
+                </div>
+            </div>
+
+            <button class="btn-submit-cancel" onclick="submitCancellation()">Confirm</button>
+            <div class="close-modal" onclick="closeModal()">Nevermind, keep my order</div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        // Inject Header & Footer
+        fetch('header.html').then(r => r.text()).then(d => { document.getElementById('header-placeholder').innerHTML = d; Array.from(document.getElementById('header-placeholder').getElementsByTagName('script')).forEach(s => eval(s.innerText)); });
+        fetch('footer.html').then(r => r.text()).then(d => document.getElementById('footer-placeholder').innerHTML = d);
+
+        const user = JSON.parse(localStorage.getItem('mridini_user'));
+        if (!user) window.location.href = 'login.html';
+
+        document.getElementById('user-name').innerHTML = `<strong>Name:</strong> ${user.name}`;
+        document.getElementById('user-email').innerHTML = `<strong>Email:</strong> ${user.email || 'N/A'}`;
+        document.getElementById('user-phone').innerHTML = `<strong>Phone:</strong> ${user.phone || 'N/A'}`;
+
+        async function loadUserOrders() {
+            try {
+                const searchParam = user.email || user.phone; 
+                const res = await fetch(`/api/user-orders/${searchParam}`);
+                const orders = await res.json();
+                
+                const container = document.getElementById('user-orders-list');
+                if(orders.length === 0) return container.innerHTML = "<p>You haven't placed any orders yet.</p>";
+
+                container.innerHTML = orders.reverse().map(o => {
+                    // Bulletproof date parsing
+                    let orderDate = new Date(o.date);
+                    if (isNaN(orderDate.getTime())) orderDate = new Date(); // If date is broken, pretend it's today so you can test it
+                    
+                    const diffDays = Math.ceil(Math.abs(new Date() - orderDate) / (1000 * 60 * 60 * 24)); 
+                    
+                    let actionHtml = '';
+                    if (diffDays <= 7 && o.status !== "Cancellation Requested" && o.status !== "Cancelled" && o.status !== "Return Requested") {
+                        
+                        // Check if it's delivered to change the button text!
+                        if (o.status === 'Delivered') {
+                            actionHtml = `<button class="cancel-btn" onclick="openCancelModal('${o.orderId}', '${o.status}')">Return Order</button>`;
+                        } else {
+                            actionHtml = `<button class="cancel-btn" onclick="openCancelModal('${o.orderId}', '${o.status}')">Cancel Order</button>`;
+                        }
+                        
+                    } else if (o.status === "Cancellation Requested" || o.status === "Return Requested") {
+                        actionHtml = `<div style="margin-top: 10px; font-size: 12px; color: #d32f2f; font-weight: bold;">Reviewing Request</div>`;
+                    }
+
+                    return `
+                    <div class="order-row">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                            <strong>${o.orderId}</strong>
+                            <span class="status-badge">${o.status}</span>
+                        </div>
+                        <div style="color:#777; margin-bottom:5px;">Placed on: ${o.date}</div>
+                        <div style="margin-bottom:10px;"><strong>Total:</strong> ₹${o.total.toFixed(2)}</div>
+                        ${actionHtml}
+                    </div>
+                `}).join('');
+            } catch (err) {
+                console.error("Failed to load orders", err);
+            }
+        }
+
+        // --- Modal Logic ---
+        // --- UPGRADED Modal Logic ---
+        function openCancelModal(orderId, status) {
+            document.getElementById('cancel-order-id').value = orderId;
+            document.getElementById('cancel-order-status').value = status;
+            
+            // Check the status to decide what UI to show
+            if (status === 'Delivered') {
+                document.getElementById('modal-title').innerText = "Request Return";
+                document.getElementById('pre-delivery-view').style.display = 'none';
+                document.getElementById('post-delivery-view').style.display = 'block';
+            } else {
+                document.getElementById('modal-title').innerText = "Cancel Order";
+                document.getElementById('pre-delivery-view').style.display = 'block';
+                document.getElementById('post-delivery-view').style.display = 'none';
+            }
+
+            document.getElementById('cancel-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('cancel-modal').style.display = 'none';
+        }
+
+        async function submitCancellation() {
+            const orderId = document.getElementById('cancel-order-id').value;
+            const status = document.getElementById('cancel-order-status').value;
+            const formData = new FormData();
+
+            // 1. Grab the button so we can control it
+            const submitBtn = document.querySelector('#cancel-modal .btn-submit-cancel');
+
+            if (status === 'Delivered') {
+                const reason = document.getElementById('cancel-reason').value;
+                const videoFile = document.getElementById('cancel-video').files[0];
+
+                if (!reason) return alert("Please select a reason.");
+                if (!videoFile) return alert("Please upload your unboxing video to proceed.");
+
+                formData.append('reason', reason);
+                formData.append('videoFile', videoFile);
+            } else {
+                formData.append('reason', 'Cancelled by user before delivery');
+            }
+
+            // 2. Change the button state to "Loading"
+            submitBtn.innerText = "Uploading Video... Please wait ⏳";
+            submitBtn.disabled = true;
+            submitBtn.style.backgroundColor = "#777"; // Make it look grayed out
+
+            try {
+                const res = await fetch(`/api/orders/${orderId}/cancel`, {
+                    method: 'POST',
+                    body: formData 
+                });
+
+                if (res.ok) {
+                    alert("Your request has been processed!");
+                    closeModal();
+                    loadUserOrders(); 
+                } else {
+                    const errorData = await res.json();
+                    alert("Server Error: " + (errorData.message || res.statusText));
+                }
+            } catch(err) {
+                alert("Network Error: Node server might be down, or the file is too large.");
+            } finally {
+                // 3. IMPORTANT: Reset the button whether it succeeds or fails!
+                submitBtn.innerText = "Confirm";
+                submitBtn.disabled = false;
+                submitBtn.style.backgroundColor = "#333";
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('mridini_user');
+            window.location.href = 'login.html';
+        }
+
+        loadUserOrders();
+    </script>
+</body>
+</html>

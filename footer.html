@@ -1,0 +1,57 @@
+<footer>
+    <div class="footer-brand">
+        <div class="logo" style="font-size: 24px; color: #a35d4d; letter-spacing: 4px; font-family: 'Georgia', serif;">MRIDINI</div>
+        <p>Mridini Emporium is known for its high-quality garments and attention to detail. The brand combines modern aesthetics with timeless elegance, making their pieces suitable for a wide range of events and everyday wear.</p>
+    </div>
+    
+    <div class="footer-column">
+        <h4>Shop</h4>
+        <ul id="footer-dynamic-categories">
+            <li>Loading...</li>
+        </ul>
+    </div>
+    
+    <div class="footer-column">
+        <h4>Policies</h4>
+        <ul>
+            <li><a href="return.html">Return & Exchange</a></li>
+            <li><a href="shipping.html">Shipping Policy</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+    </div>
+    
+    <div class="footer-bottom">
+        &copy; 2026 Mridini Emporium | Developed by tendinginfinity.
+    </div>
+</footer>
+
+<script>
+    async function loadFooterCategories() {
+        try {
+            const response = await fetch('/api/products');
+            const products = await response.json();
+            
+            // Extract unique categories
+            const categories = [...new Set(products.map(p => p.category))].filter(Boolean);
+            
+            // Shuffle them and pick the first 4
+            const shuffled = categories.sort(() => 0.5 - Math.random()).slice(0, 4);
+            
+            const ul = document.getElementById('footer-dynamic-categories');
+            ul.innerHTML = ''; // Clear loading text
+            
+            if (shuffled.length === 0) {
+                ul.innerHTML = '<li><a href="shop.html">Shop All</a></li>';
+                return;
+            }
+            
+            shuffled.forEach(cat => {
+                ul.innerHTML += `<li><a href="shop.html?category=${encodeURIComponent(cat)}">${cat}</a></li>`;
+            });
+        } catch (error) {
+            console.error("Failed to load footer categories", error);
+        }
+    }
+    loadFooterCategories();
+</script>

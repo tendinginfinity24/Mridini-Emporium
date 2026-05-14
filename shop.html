@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - Mridini</title>
+    <style>
+        /* Base Styles */
+        body { font-family: 'Georgia', serif; margin: 0; padding: 0; color: #333; line-height: 1.6; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; padding: 0; margin: 0; }
+
+        /* --- Header Styles --- */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid #f0f0f0; }
+        .search-bar { flex: 1; display: flex; justify-content: flex-start; }
+        .search-bar input { padding: 10px 15px; border: 1px solid #ccc; border-radius: 20px; font-family: sans-serif; width: 250px; }
+        .logo-container { flex: 1; display: flex; justify-content: center; }
+        .logo-img { width: 100px; height: 100px; object-fit: contain; }
+        .header-icons { flex: 1; display: flex; justify-content: flex-end; gap: 15px; }
+        .icon-circle { width: 40px; height: 40px; border: 1px solid #ccc; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; position: relative; cursor: pointer; }
+        .cart-count { position: absolute; top: -5px; right: -5px; background-color: #a35d4d; color: white; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: sans-serif; }
+        
+        .main-nav { display: flex; justify-content: center; gap: 30px; padding: 15px 0; font-size: 15px; border-bottom: 1px solid #f0f0f0; }
+        .main-nav a:hover { color: #a35d4d; }
+
+        /* --- Shop Layout (Sidebar + Grid) --- */
+        .shop-container { display: flex; max-width: 1300px; margin: 40px auto; padding: 0 40px; gap: 50px; }
+        
+        /* Sidebar Styles */
+        .sidebar { width: 220px; flex-shrink: 0; }
+        .filter-section { margin-bottom: 40px; }
+        .filter-title { font-size: 16px; color: #333; margin-bottom: 20px; }
+        
+        .filter-list li { margin-bottom: 12px; display: flex; align-items: center; gap: 12px; font-size: 14px; color: #555; cursor: pointer; }
+        .filter-list input[type="radio"] { accent-color: #a35d4d; width: 16px; height: 16px; cursor: pointer; }
+        
+        /* Faking the dual slider visually for now */
+        .price-slider-visual { width: 100%; height: 4px; background-color: #a35d4d; position: relative; margin: 20px 0; border-radius: 2px;}
+        .slider-handle { width: 12px; height: 12px; background: white; border: 3px solid #a35d4d; border-radius: 50%; position: absolute; top: -7px; }
+        .price-controls { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #555; }
+        .reset-btn { background-color: #3b3f46; color: white; border: none; padding: 8px 16px; font-family: sans-serif; font-size: 12px; font-weight: bold; cursor: pointer; }
+
+        /* Product Grid Styles */
+        .product-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 30px; align-content: start; }
+        .product-card { display: flex; flex-direction: column; position: relative; cursor: pointer;}
+        .product-media { width: 100%; aspect-ratio: 9 / 16; object-fit: cover; background-color: #f4f4f4; margin-bottom: 15px; border-radius: 4px; }
+        
+        /* Pricing UI */
+        .price-row { display: flex; gap: 8px; align-items: baseline; }
+        .scratched-price { text-decoration: line-through; color: #a0a0a0; font-size: 13px; }
+        .selling-price { color: #a35d4d; font-size: 15px; font-weight: bold; }
+        .product-price { font-size: 14px; color: #777; }
+        .out-of-stock { position: absolute; top: 10px; right: 0; background-color: #d32f2f; color: white; padding: 5px 10px; font-size: 12px; font-weight: bold; font-family: sans-serif; z-index: 2;}
+
+        /* --- Footer Styles --- */
+        footer { border-top: 1px solid #eee; padding: 60px 40px 20px 40px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-top: 60px; }
+        .footer-brand .logo { text-align: left; margin-bottom: 20px; font-size: 24px; color: #a35d4d; letter-spacing: 4px; }
+        .footer-brand p { color: #555; font-size: 14px; max-width: 400px; }
+        .footer-column h4 { font-size: 18px; color: #333; margin-bottom: 20px; }
+        .footer-column ul li { margin-bottom: 12px; color: #555; font-size: 14px; cursor: pointer; }
+        .footer-column ul li:hover { color: #a35d4d; }
+        .footer-bottom { grid-column: 1 / -1; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 13px; color: #777; }
+
+        /* Hover Cart Styles */
+        .product-card { display: flex; flex-direction: column; position: relative; }
+        .product-image-wrapper { position: relative; overflow: hidden; display: block; border-radius: 4px; }
+        .hover-cart-btn { 
+            position: absolute; bottom: 0; left: 0; width: 100%; 
+            background: rgba(255, 255, 255, 0.95); border: none; padding: 15px; 
+            color: #a35d4d; font-size: 14px; font-weight: bold; font-family: sans-serif;
+            cursor: pointer; transform: translateY(100%); transition: transform 0.3s ease; 
+        }
+        .product-image-wrapper:hover .hover-cart-btn { transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <div id="header-placeholder"></div>
+
+    <div class="shop-container">
+        
+        <aside class="sidebar">
+            <div class="filter-section">
+                <h3 class="filter-title">Price Range</h3>
+                <div class="price-slider-visual">
+                    <div class="slider-handle" style="left: 0%;"></div>
+                    <div class="slider-handle" style="right: 0%;"></div>
+                </div>
+                <div class="price-controls">
+                    <span>₹1000 - ₹15000</span>
+                    <button class="reset-btn">RESET</button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3 class="filter-title">Product Categories</h3>
+                <ul class="filter-list" id="dynamic-category-list"></ul>
+            </div>
+
+            <div class="filter-section">
+                <h3 class="filter-title">Size</h3>
+                <ul class="filter-list" id="dynamic-size-list"></ul>
+            </div>
+        </aside>
+
+        <main class="product-grid" id="dynamic-product-grid"></main>
+
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        async function loadShopPage() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const categoryParam = urlParams.get('category');
+                const sizeParam = urlParams.get('size');
+                
+                // FIXED: ALWAYS fetch all products so we don't hit a missing backend route
+                const response = await fetch('/api/products');
+                let products = await response.json();
+
+                // Client-side Category Filter
+                if (categoryParam && categoryParam !== 'all') {
+                    products = products.filter(p => p.category && p.category.toLowerCase() === categoryParam.toLowerCase());
+                }
+
+                // Client-side Size Filter
+                if (sizeParam && sizeParam !== 'all') {
+                    products = products.filter(p => p.sizes && p.sizes.some(s => s.toLowerCase() === sizeParam.toLowerCase()));
+                }
+
+                // (Existing Code inside loadShopPage)
+                // Client-side Category Filter
+                if (categoryParam && categoryParam !== 'all') {
+                    products = products.filter(p => p.category && p.category.toLowerCase() === categoryParam.toLowerCase());
+                }
+
+                // Client-side Size Filter
+                if (sizeParam && sizeParam !== 'all') {
+                    products = products.filter(p => p.sizes && p.sizes.some(s => s.toLowerCase() === sizeParam.toLowerCase()));
+                }
+
+                // --- ADD THIS NEW SEARCH FILTER LOGIC ---
+                const searchParam = urlParams.get('search');
+                if (searchParam) {
+                    const q = searchParam.toLowerCase();
+                    products = products.filter(p => 
+                        (p.name && p.name.toLowerCase().includes(q)) || 
+                        (p.category && p.category.toLowerCase().includes(q)) ||
+                        (p.description && p.description.toLowerCase().includes(q))
+                    );
+                }
+                // ----------------------------------------
+
+                const grid = document.getElementById('dynamic-product-grid');
+                grid.innerHTML = ''; 
+
+                if (products.length === 0) {
+                    grid.innerHTML = '<p style="text-align:center; width:100%; grid-column: 1/-1;">No products found matching these filters.</p>';
+                    return;
+                }
+
+                // Render the cards safely
+                products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    const stockBadge = product.inStock !== false ? '' : '<div class="out-of-stock">Out of Stock</div>';
+
+                    // Bulletproof Media Extraction
+                    let primaryMediaUrl = "https://via.placeholder.com/1080x1920?text=No+Image";
+                    if (product.media && Array.isArray(product.media) && product.media.length > 0 && product.media[0]) {
+                        primaryMediaUrl = product.media[0];
+                    } else if (product.image) {
+                        primaryMediaUrl = product.image; 
+                    }
+
+                    const safeUrlStr = String(primaryMediaUrl);
+                    let mediaHtml = safeUrlStr.toLowerCase().endsWith('.mp4') 
+                        ? `<video class="product-media" src="${safeUrlStr}" autoplay loop muted playsinline></video>`
+                        : `<img class="product-media" src="${safeUrlStr}" alt="${product.name}">`;
+
+                    const safeOrig = Number(product.originalPrice) || 0;
+                    const safePrice = Number(product.price) || 0;
+
+                    let priceHtml = (safeOrig > safePrice)
+                        ? `<div class="price-row"><span class="scratched-price">₹${safeOrig.toFixed(2)}</span><span class="selling-price">₹${safePrice.toFixed(2)}</span></div>`
+                        : `<div class="product-price">₹${safePrice.toFixed(2)}</div>`;
+
+                    card.innerHTML = `
+                        <a href="product.html?id=${product.id}" class="product-image-wrapper">
+                            ${stockBadge}
+                            ${mediaHtml}
+                            <button class="hover-cart-btn" onclick="event.preventDefault(); window.location.href='product.html?id=${product.id}';">👁️ VIEW PRODUCT</button>
+                        </a>
+                        <a href="product.html?id=${product.id}" style="margin-top: 10px;">
+                            <div class="product-title" style="color: #333;">${product.name || "Product"}</div>
+                            ${priceHtml}
+                        </a>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                console.error("Server connection failed:", error);
+            }
+        }
+
+        async function loadSidebar() {
+            try {
+                const response = await fetch('/api/products');
+                const allProducts = await response.json();
+                const urlParams = new URLSearchParams(window.location.search);
+
+                const categories = [...new Set(allProducts.map(p => p.category))].filter(Boolean);
+                const categoryList = document.getElementById('dynamic-category-list');
+                categoryList.innerHTML = `<li><input type="radio" name="category" value="all"> All Categories</li>`;
+                categories.forEach(cat => {
+                    categoryList.innerHTML += `<li><input type="radio" name="category" value="${cat}"> ${cat}</li>`;
+                });
+
+                const rawSizes = allProducts.flatMap(p => p.sizes || []);
+                const uniqueSizes = [...new Set(rawSizes.map(s => s.trim()))].filter(Boolean);
+                const sizeList = document.getElementById('dynamic-size-list');
+                sizeList.innerHTML = `<li><input type="radio" name="size" value="all"> All Sizes</li>`;
+                uniqueSizes.forEach(size => {
+                    sizeList.innerHTML += `<li><input type="radio" name="size" value="${size}"> ${size}</li>`;
+                });
+
+                const activeCat = urlParams.get('category');
+                if (activeCat) {
+                    const catRadio = document.querySelector(`input[name="category"][value="${activeCat}"]`);
+                    if (catRadio) catRadio.checked = true;
+                }
+
+                const activeSize = urlParams.get('size');
+                if (activeSize) {
+                    const sizeRadio = document.querySelector(`input[name="size"][value="${activeSize}"]`);
+                    if (sizeRadio) sizeRadio.checked = true;
+                }
+
+                document.querySelector('.sidebar').addEventListener('change', (e) => {
+                    if (e.target.name === 'category' || e.target.name === 'size') {
+                        const filterType = e.target.name;
+                        const filterValue = e.target.value;
+                        const currentParams = new URLSearchParams(window.location.search);
+                        
+                        if (filterValue === 'all') currentParams.delete(filterType);
+                        else currentParams.set(filterType, filterValue);
+
+                        window.location.search = currentParams.toString();
+                    }
+                });
+
+            } catch (error) {
+                console.error("Failed to load dynamic sidebar:", error);
+            }
+        }
+
+        loadShopPage();
+        loadSidebar();
+    </script>
+
+    <script>
+        fetch('header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+                const scripts = document.getElementById('header-placeholder').getElementsByTagName('script');
+                for (let i = 0; i < scripts.length; i++) eval(scripts[i].innerText);
+            });
+
+        fetch('footer.html')
+            .then(response => response.text())
+            .then(data => document.getElementById('footer-placeholder').innerHTML = data);
+    </script>
+</body>
+</html>
