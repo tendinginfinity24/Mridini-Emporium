@@ -22,6 +22,46 @@
         .order-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #a35d4d;}
         .order-details { font-size: 14px; color: #333; line-height: 1.5;}
         .order-items { margin-top: 10px; font-size: 13px; color: #555; background: white; padding: 10px; border: 1px dashed #ccc;}
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            /* Stack the top bar */
+            .top-bar { 
+                flex-direction: column; 
+                gap: 15px; 
+                padding: 15px 20px; 
+            }
+            
+            /* Make the search bar span the whole screen */
+            .search-bar { width: 100%; order: 3; justify-content: center; }
+            .search-bar input { width: 100%; max-width: 400px; }
+            
+            /* Center the logo and icons */
+            .logo-container { order: 1; }
+            .header-icons { width: 100%; justify-content: center; order: 2; margin-top: 10px; }
+            
+            /* Wrap the navigation links so they don't slide off screen */
+            .main-nav { 
+                flex-wrap: wrap; 
+                gap: 15px; 
+                padding: 15px 20px; 
+                text-align: center;
+            }
+            
+            /* Stack the footer columns into 1 single column */
+            footer { 
+                grid-template-columns: 1fr; 
+                padding: 40px 20px 20px 20px; 
+                gap: 30px;
+                text-align: center;
+            }
+            .footer-brand .logo { text-align: center; }
+            
+            /* Stack the two halves of the Contact page */
+            .contact-container, .page-container { 
+                flex-direction: column; 
+                margin: 30px auto; 
+            }
+        }
     </style>
 </head>
 <body>
