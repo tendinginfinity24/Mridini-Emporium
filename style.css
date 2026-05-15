@@ -25,6 +25,7 @@ footer { border-top: 1px solid #eee; padding: 60px 40px 20px 40px; display: grid
 .footer-bottom { grid-column: 1 / -1; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 13px; color: #777; }
 
 /* --- UPGRADED MOBILE RESPONSIVENESS --- */
+/* --- UPGRADED MOBILE RESPONSIVENESS --- */
 @media (max-width: 768px) {
     /* 1. Sleek App-Like Header */
     /* --- THE PERFECT CENTER MOBILE HEADER --- */
