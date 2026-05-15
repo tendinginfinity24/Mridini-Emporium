@@ -23,3 +23,91 @@ footer { border-top: 1px solid #eee; padding: 60px 40px 20px 40px; display: grid
 .footer-column ul li { margin-bottom: 12px; color: #555; font-size: 14px; cursor: pointer; }
 .footer-column ul li:hover { color: #a35d4d; }
 .footer-bottom { grid-column: 1 / -1; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 13px; color: #777; }
+
+/* --- UPGRADED MOBILE RESPONSIVENESS --- */
+@media (max-width: 768px) {
+    /* 1. Sleek App-Like Header */
+    /* --- THE PERFECT CENTER MOBILE HEADER --- */
+    .top-bar { 
+        display: flex;
+        flex-wrap: wrap; 
+        align-items: center; 
+        justify-content: space-between; 
+        padding: 10px 15px; 
+    }
+
+    /* Left Side: Hamburger Menu */
+    .hamburger {
+        order: 1;
+        flex: 1; /* Takes up equal space to push logo to center */
+        display: flex;
+        justify-content: flex-start;
+        font-size: 24px;
+        color: #333;
+    }
+
+    /* Center: Logo */
+    .logo-container { 
+        order: 2; 
+        flex: 1; /* Matches the left/right weight */
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Right Side: Icons */
+    .header-icons { 
+        order: 3; 
+        flex: 1; /* Matches the left/center weight */
+        display: flex;
+        justify-content: flex-end; 
+        gap: 15px; 
+        margin-top: 0; 
+        width: auto;
+    }
+
+    /* Bottom Row: Search Bar (Drops above the hero section) */
+    .search-bar { 
+        order: 4; 
+        width: 100%; 
+        margin-top: 15px; 
+        display: flex;
+        justify-content: center;
+    }
+    .search-bar input {
+        width: 100%;
+        padding: 10px 15px;
+        border-radius: 25px; /* Gives it that nice pill shape */
+    }
+
+    /* 2. Horizontal Scrolling for Links & Categories */
+    .main-nav { 
+        display: flex;
+        flex-direction: row; 
+        flex-wrap: nowrap;
+        overflow-x: auto; /* Allows swiping left/right */
+        white-space: nowrap; 
+        padding: 10px 15px; 
+        justify-content: flex-start;
+        gap: 20px;
+    }
+    /* Hide the scrollbar for a cleaner look */
+    .main-nav::-webkit-scrollbar { display: none; }
+    
+    /* 3. Side-by-Side Product Grid */
+    /* NOTE: Make sure '.product-grid' matches the actual class name of your product container in your HTML! */
+    .product-grid { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; /* This is the magic line that creates 2 columns! */
+        gap: 10px; 
+        padding: 10px;
+    }
+    .product-card h3 { font-size: 13px; margin-top: 8px; } /* Shrinks text to fit the smaller cards */
+    .product-card p { font-size: 14px; font-weight: bold; }
+    
+    /* 4. Fix Footer & Spacing */
+    footer { 
+        grid-template-columns: 1fr; 
+        text-align: center; 
+        padding: 30px 15px;
+    }
+}
