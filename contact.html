@@ -35,7 +35,53 @@
         button:hover { background: #a35d4d; }
         /* --- MOBILE RESPONSIVENESS --- */
         /* --- UPGRADED MOBILE RESPONSIVENESS --- */
-        
+        @media (max-width: 768px) {
+            /* 1. Sleek App-Like Header */
+            .top-bar { 
+                display: flex;
+                flex-direction: row; 
+                flex-wrap: wrap; 
+                justify-content: space-between; 
+                align-items: center; 
+                padding: 10px 15px; 
+            }
+            .logo-container { order: 1; }
+            .header-icons { order: 2; width: auto; margin-top: 0; justify-content: flex-end; }
+            .search-bar { order: 3; width: 100%; margin-top: 15px; }
+            .search-bar input { width: 100%; }
+
+            /* 2. Horizontal Scrolling for Links & Categories */
+            .main-nav { 
+                display: flex;
+                flex-direction: row; 
+                flex-wrap: nowrap;
+                overflow-x: auto; /* Allows swiping left/right */
+                white-space: nowrap; 
+                padding: 10px 15px; 
+                justify-content: flex-start;
+                gap: 20px;
+            }
+            /* Hide the scrollbar for a cleaner look */
+            .main-nav::-webkit-scrollbar { display: none; }
+            
+            /* 3. Side-by-Side Product Grid */
+            /* NOTE: Make sure '.product-grid' matches the actual class name of your product container in your HTML! */
+            .product-grid { 
+                display: grid; 
+                grid-template-columns: 1fr 1fr; /* This is the magic line that creates 2 columns! */
+                gap: 10px; 
+                padding: 10px;
+            }
+            .product-card h3 { font-size: 13px; margin-top: 8px; } /* Shrinks text to fit the smaller cards */
+            .product-card p { font-size: 14px; font-weight: bold; }
+            
+            /* 4. Fix Footer & Spacing */
+            footer { 
+                grid-template-columns: 1fr; 
+                text-align: center; 
+                padding: 30px 15px;
+            }
+        }
     </style>
 </head>
 <body>
