@@ -33,18 +33,61 @@
         /* --- UPGRADED MOBILE RESPONSIVENESS --- */
         @media (max-width: 768px) {
             /* 1. Sleek App-Like Header */
+            /* --- THE PERFECT CENTER MOBILE HEADER --- */
+        /* --- THE PERFECT CENTER MOBILE HEADER --- */
+            /* --- THE PERFECT CENTER MOBILE HEADER --- */
             .top-bar { 
-                display: flex;
-                flex-direction: row; 
-                flex-wrap: wrap; 
-                justify-content: space-between; 
-                align-items: center; 
-                padding: 10px 15px; 
+                display: flex !important;
+                flex-wrap: wrap !important; /* Allows multiple rows */
+                align-items: center !important; 
+                justify-content: space-between !important; 
+                padding: 10px 15px !important; 
             }
-            .logo-container { order: 1; }
-            .header-icons { order: 2; width: auto; margin-top: 0; justify-content: flex-end; }
-            .search-bar { order: 3; width: 100%; margin-top: 15px; }
-            .search-bar input { width: 100%; }
+
+            /* Left Side: Hamburger Menu */
+            .hamburger {
+                display: flex !important; 
+                order: 1 !important;
+                flex: 1 1 30% !important; /* Takes exactly 1/3 of the top row */
+                justify-content: flex-start !important;
+                font-size: 28px !important; /* Made it a tiny bit bigger to match Zimal */
+                color: #333 !important;
+            }
+
+            /* Center: Logo */
+            .logo-container { 
+                order: 2 !important; 
+                flex: 1 1 40% !important; /* Takes the middle chunk */
+                display: flex !important;
+                justify-content: center !important;
+            }
+
+            /* Right Side: Icons */
+            .header-icons { 
+                order: 3 !important; 
+                flex: 1 1 30% !important; /* Takes exactly 1/3 of the top row */
+                display: flex !important;
+                justify-content: flex-end !important; 
+                gap: 15px !important; 
+                margin-top: 0 !important; 
+            }
+
+            /* Bottom Row: Search Bar */
+            .search-bar { 
+                order: 4 !important; 
+                flex: 0 0 100% !important; /* The Magic Fix: Do not shrink, take 100% of the next line! */
+                width: 100% !important; 
+                margin-top: 15px !important; 
+                display: flex !important;
+                justify-content: center !important;
+            }
+            
+            .search-bar input {
+                width: 100% !important;
+                padding: 10px 15px !important;
+                border-radius: 25px !important; 
+                border: 1px solid #ccc !important; /* Adds a nice subtle border like Zimal */
+            }
 
             /* 2. Horizontal Scrolling for Links & Categories */
             .main-nav { 
