@@ -75,56 +75,57 @@
         @media (max-width: 768px) {
             /* 1. Sleek App-Like Header */
             /* --- THE PERFECT CENTER MOBILE HEADER --- */
-        .top-bar { 
-            display: flex;
-            flex-wrap: wrap; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 10px 15px; 
-        }
+        /* --- THE PERFECT CENTER MOBILE HEADER --- */
+            .top-bar { 
+                display: flex !important;
+                flex-wrap: wrap !important; /* Forces the search bar to a new line */
+                align-items: center; 
+                justify-content: space-between; 
+                padding: 10px 15px; 
+            }
 
-        /* Left Side: Hamburger Menu */
-        .hamburger {
-            order: 1;
-            flex: 1; /* Takes up equal space to push logo to center */
-            display: flex;
-            justify-content: flex-start;
-            font-size: 24px;
-            color: #333;
-        }
+            /* Left Side: Hamburger Menu */
+            .hamburger {
+                display: flex !important; /* Overrides the hidden HTML style */
+                order: 1;
+                flex: 1; 
+                justify-content: flex-start;
+                font-size: 24px;
+                color: #333;
+            }
 
-        /* Center: Logo */
-        .logo-container { 
-            order: 2; 
-            flex: 1; /* Matches the left/right weight */
-            display: flex;
-            justify-content: center;
-        }
+            /* Center: Logo */
+            .logo-container { 
+                order: 2; 
+                flex: 1; 
+                display: flex;
+                justify-content: center;
+            }
 
-        /* Right Side: Icons */
-        .header-icons { 
-            order: 3; 
-            flex: 1; /* Matches the left/center weight */
-            display: flex;
-            justify-content: flex-end; 
-            gap: 15px; 
-            margin-top: 0; 
-            width: auto;
-        }
+            /* Right Side: Icons */
+            .header-icons { 
+                order: 3; 
+                flex: 1; 
+                display: flex;
+                justify-content: flex-end; 
+                gap: 15px; 
+                margin-top: 0; 
+                width: auto;
+            }
 
-        /* Bottom Row: Search Bar (Drops above the hero section) */
-        .search-bar { 
-            order: 4; 
-            width: 100%; 
-            margin-top: 15px; 
-            display: flex;
-            justify-content: center;
-        }
-        .search-bar input {
-            width: 100%;
-            padding: 10px 15px;
-            border-radius: 25px; /* Gives it that nice pill shape */
-        }
+            /* Bottom Row: Search Bar */
+            .search-bar { 
+                order: 4; 
+                width: 100% !important; /* Forces it to span the whole screen below */
+                margin-top: 15px; 
+                display: flex;
+                justify-content: center;
+            }
+            .search-bar input {
+                width: 100%;
+                padding: 10px 15px;
+                border-radius: 25px; 
+            }
 
             /* 2. Horizontal Scrolling for Links & Categories */
             .main-nav { 
