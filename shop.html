@@ -71,6 +71,10 @@
             cursor: pointer; transform: translateY(100%); transition: transform 0.3s ease; 
         }
         .product-image-wrapper:hover .hover-cart-btn { transform: translateY(0); }
+        /* Hide the mobile filter button on desktop */
+        .mobile-filter-btn {
+            display: none; 
+        }
         /* --- MOBILE RESPONSIVENESS --- */
         /* --- UPGRADED MOBILE RESPONSIVENESS --- */
         @media (max-width: 768px) {
@@ -167,29 +171,60 @@
             /* NOTE: Make sure '.product-grid' matches the actual class name of your product container in your HTML! */
             /* --- SHOP PAGE MOBILE --- */
         /* Change the main container from row to column */
-            .shop-container, .shop-layout { 
-                display: flex !important;
-                flex-direction: column !important; 
-                padding: 10px !important;
-            }
-            
-            /* Make the sidebar take the full width above the products */
-            .sidebar, .filter-sidebar {
-                width: 100% !important;
-                margin-bottom: 20px !important;
-                border-right: none !important; /* Removes the desktop divider line */
-                padding-right: 0 !important;
-            }
+            /* --- SHOP PAGE MOBILE --- */
+        .shop-container, .shop-layout { 
+            display: flex !important;
+            flex-direction: column !important; 
+            padding: 10px !important;
+        }
+        
+        /* Force the products to the TOP */
+        .products-section, .product-list, .main-content {
+            order: 1 !important; 
+            width: 100% !important;
+        }
 
-            /* Force the products into 2 columns */
-            .product-grid {
-                width: 100% !important;
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important; /* 2 columns! */
-                gap: 10px !important;
-            }
-            .product-card h3 { font-size: 13px; margin-top: 8px; } /* Shrinks text to fit the smaller cards */
-            .product-card p { font-size: 14px; font-weight: bold; }
+        /* Show and style the Filter Button */
+        .mobile-filter-btn {
+            display: flex !important; 
+            width: 100%;
+            padding: 12px;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border: 1px solid #333;
+            border-radius: 4px;
+            font-family: 'Georgia', serif;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        /* Hide the sidebar by default! */
+        .sidebar, .filter-sidebar {
+            display: none !important; /* This makes it invisible initially */
+            order: 2 !important; 
+            width: 100% !important;
+            margin-top: 10px !important; 
+            padding-top: 20px !important;
+            border-top: 1px solid #eee !important; 
+            border-right: none !important; 
+            padding-right: 0 !important;
+        }
+
+        /* The magic class that JS will add to reveal the filters */
+        .sidebar.show-filters, .filter-sidebar.show-filters {
+            display: block !important;
+        }
+
+        /* Products Grid */
+        .product-grid {
+            width: 100% !important;
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 10px !important;
+        }
             
             /* 4. Fix Footer & Spacing */
             footer { 
@@ -203,6 +238,10 @@
 <body>
 
     <div id="header-placeholder"></div>
+
+    <button id="mobile-filter-btn" class="mobile-filter-btn">
+        <span style="font-size: 18px;">⧨</span> Filter
+    </button>
 
     <div class="shop-container">
         
@@ -399,6 +438,22 @@
         fetch('footer.html')
             .then(response => response.text())
             .then(data => document.getElementById('footer-placeholder').innerHTML = data);
+    </script>
+    <script>
+        // Make the Mobile Filter Button work
+        const filterBtn = document.getElementById('mobile-filter-btn');
+        
+        if(filterBtn) {
+            filterBtn.addEventListener('click', function() {
+                // Find your sidebar (change '.sidebar' if you named it something else!)
+                const sidebar = document.querySelector('.sidebar') || document.querySelector('.filter-sidebar');
+                
+                if(sidebar) {
+                    // This toggles the magic CSS class on and off
+                    sidebar.classList.toggle('show-filters');
+                }
+            });
+        }
     </script>
 </body>
 </html>
