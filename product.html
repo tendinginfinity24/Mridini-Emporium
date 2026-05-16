@@ -202,10 +202,47 @@
 
             /* --- PRODUCT PAGE MOBILE --- */
         /* Change the main container from row to column */
-        .product-detail-container, .single-product {
+        /* --- PRODUCT PAGE: FORCED MOBILE STACK --- */
+        
+        /* 1. Target the main wrapper (covering all common names) */
+        .product-detail-container, 
+        .single-product, 
+        .product-wrap, 
+        .product-container, 
+        .product-main {
             display: flex !important;
             flex-direction: column !important;
-            padding: 10px !important;
+            width: 100% !important;
+            padding: 15px !important;
+            box-sizing: border-box !important;
+        }
+
+        /* 2. Target the left/image half */
+        .product-image-section, 
+        .product-gallery, 
+        .left-column {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin-bottom: 20px !important;
+            display: block !important;
+        }
+
+        /* Make sure the main image shrinks to fit */
+        .main-product-image, 
+        #main-image {
+            width: 100% !important;
+            height: auto !important;
+            object-fit: cover !important;
+        }
+
+        /* 3. Target the right/text half */
+        .product-info-section, 
+        .product-details, 
+        .right-column {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding-left: 0 !important; /* Kills desktop left-padding */
+            display: block !important;
         }
 
         /* Make the image section take 100% width */
