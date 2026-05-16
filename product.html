@@ -270,6 +270,30 @@
         .product-buttons button {
             width: 100% !important; /* Makes buttons wide and easy to tap */
         }
+        /* --- EXACT PRODUCT PAGE FIX --- */
+        .product-layout {
+            display: flex !important;
+            flex-direction: column !important; /* Stacks them */
+            width: 100% !important;
+            padding: 15px !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+        }
+
+        .gallery-container {
+            width: 100% !important;
+            max-width: 100% !important; /* Kills the desktop 50% rule! */
+            margin-bottom: 20px !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        .details-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+        }
             
             /* 4. Fix Footer & Spacing */
             footer { 
