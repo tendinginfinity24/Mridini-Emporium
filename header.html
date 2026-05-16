@@ -1,3 +1,64 @@
+<style>
+    /* --- MOBILE SIDEBAR MENU STYLES --- */
+    .mobile-side-menu {
+        position: fixed;
+        top: 0;
+        left: -300px; /* Hides it off-screen */
+        width: 280px;
+        height: 100vh;
+        background-color: white;
+        z-index: 9999;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+        transition: left 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .mobile-side-menu.open {
+        left: 0; /* Slides it onto the screen! */
+    }
+    
+    .mobile-menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0,0,0,0.6); /* Darkens the background */
+        z-index: 9998;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease-in-out;
+    }
+    
+    .mobile-menu-overlay.open {
+        opacity: 1;
+        pointer-events: auto; /* Makes the background clickable to close */
+    }
+    
+    .mobile-menu-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .mobile-menu-links {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+    }
+    
+    .mobile-menu-links a {
+        padding: 15px 0;
+        font-size: 16px;
+        color: #333;
+        border-bottom: 1px solid #f5f5f5;
+        font-family: sans-serif;
+    }
+</style>
+
 <div class="top-bar">
     <div class="hamburger" style="display: none; font-size: 28px; cursor: pointer;">☰</div>
 
@@ -17,8 +78,63 @@
         <input type="text" id="global-search-input" placeholder="Search for Gowns, Suits, etc...">
     </div>
 </div>
+
 <nav class="main-nav">
     <a href="shop.html">Shop All</a><a href="shop.html?category=Suits">Suits</a>
     <a href="shop.html?category=Gowns">Gowns</a><a href="shop.html?category=Co-ords">Co-ords</a>
     <a href="shop.html?category=Accessories">Accessories</a><a href="shop.html?category=Sarees">Sarees</a>
 </nav>
+
+<div id="mobile-menu-overlay" class="mobile-menu-overlay"></div>
+<div id="mobile-side-menu" class="mobile-side-menu">
+    <div class="mobile-menu-header">
+        <span style="font-size: 20px; font-weight: bold; color: #a35d4d; letter-spacing: 2px;">Mridini</span>
+        <span id="close-mobile-menu" style="font-size: 32px; cursor: pointer; line-height: 1;">&times;</span>
+    </div>
+    <div class="mobile-menu-links">
+        <a href="website.html">Home</a>
+        <a href="shop.html">Shop All</a>
+        <a href="shop.html?category=Suits">Suits</a>
+        <a href="shop.html?category=Gowns">Gowns</a>
+        <a href="shop.html?category=Co-ords">Co-ords</a>
+        <a href="shop.html?category=Accessories">Accessories</a>
+        <a href="shop.html?category=Sarees">Sarees</a>
+    </div>
+</div>
+
+<script>
+    // Inject Header and force its scripts to run!
+// 1. Inject the Header
+fetch('header.html')
+            .then(response => response.text())
+            .then(data => {
+                // A. Put the HTML on the page
+                document.getElementById('header-placeholder').innerHTML = data;
+                
+                // B. NOW that the HTML is on the page, activate the Hamburger!
+                const hamburger = document.querySelector('.hamburger');
+                const sideMenu = document.getElementById('mobile-side-menu');
+                const overlay = document.getElementById('mobile-menu-overlay');
+                const closeBtn = document.getElementById('close-mobile-menu');
+
+                if (hamburger && sideMenu && overlay && closeBtn) {
+                    // Open the menu
+                    hamburger.addEventListener('click', () => {
+                        sideMenu.classList.add('open');
+                        overlay.classList.add('open');
+                    });
+
+                    // Close the menu (clicking the X)
+                    closeBtn.addEventListener('click', () => {
+                        sideMenu.classList.remove('open');
+                        overlay.classList.remove('open');
+                    });
+
+                    // Close the menu (clicking the dark background)
+                    overlay.addEventListener('click', () => {
+                        sideMenu.classList.remove('open');
+                        overlay.classList.remove('open');
+                    });
+                }
+            });
+</script>

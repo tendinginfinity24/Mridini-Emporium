@@ -23,96 +23,22 @@
         .order-details { font-size: 14px; color: #333; line-height: 1.5;}
         .order-items { margin-top: 10px; font-size: 13px; color: #555; background: white; padding: 10px; border: 1px dashed #ccc;}
         /* --- MOBILE RESPONSIVENESS --- */
-/* --- UPGRADED MOBILE RESPONSIVENESS --- */
-@media (max-width: 768px) {
-            /* 1. Sleek App-Like Header */
-            /* --- THE PERFECT CENTER MOBILE HEADER --- */
-        /* --- THE PERFECT CENTER MOBILE HEADER --- */
-            /* --- THE PERFECT CENTER MOBILE HEADER --- */
-            .top-bar { 
-                display: flex !important;
-                flex-wrap: wrap !important; /* Allows multiple rows */
-                align-items: center !important; 
-                justify-content: space-between !important; 
-                padding: 10px 15px !important; 
-            }
-
-            /* Left Side: Hamburger Menu */
-            .hamburger {
-                display: flex !important; 
-                order: 1 !important;
-                flex: 1 1 30% !important; /* Takes exactly 1/3 of the top row */
-                justify-content: flex-start !important;
-                font-size: 28px !important; /* Made it a tiny bit bigger to match Zimal */
-                color: #333 !important;
-            }
-
-            /* Center: Logo */
-            .logo-container { 
-                order: 2 !important; 
-                flex: 1 1 40% !important; /* Takes the middle chunk */
-                display: flex !important;
-                justify-content: center !important;
-            }
-
-            /* Right Side: Icons */
-            .header-icons { 
-                order: 3 !important; 
-                flex: 1 1 30% !important; /* Takes exactly 1/3 of the top row */
-                display: flex !important;
-                justify-content: flex-end !important; 
-                gap: 15px !important; 
-                margin-top: 0 !important; 
-            }
-
-            /* Bottom Row: Search Bar */
-            .search-bar { 
-                order: 4 !important; 
-                flex: 0 0 100% !important; /* The Magic Fix: Do not shrink, take 100% of the next line! */
-                width: 100% !important; 
-                margin-top: 15px !important; 
-                display: flex !important;
-                justify-content: center !important;
-            }
-            
-            .search-bar input {
-                width: 100% !important;
-                padding: 10px 15px !important;
-                border-radius: 25px !important; 
-                border: 1px solid #ccc !important; /* Adds a nice subtle border like Zimal */
-            }
-
-            /* 2. Horizontal Scrolling for Links & Categories */
-            .main-nav { 
-                display: flex;
-                flex-direction: row; 
-                flex-wrap: nowrap;
-                overflow-x: auto; /* Allows swiping left/right */
-                white-space: nowrap; 
-                padding: 10px 15px; 
-                justify-content: flex-start;
-                gap: 20px;
-            }
-            /* Hide the scrollbar for a cleaner look */
+        @media (max-width: 768px) {
+            .top-bar { display: flex !important; flex-wrap: wrap !important; align-items: center !important; justify-content: space-between !important; padding: 10px 15px !important; }
+            .hamburger { display: flex !important; order: 1 !important; flex: 1 1 30% !important; justify-content: flex-start !important; font-size: 28px !important; color: #333 !important; }
+            .logo-container { order: 2 !important; flex: 1 1 40% !important; display: flex !important; justify-content: center !important; }
+            .header-icons { order: 3 !important; flex: 1 1 30% !important; display: flex !important; justify-content: flex-end !important; gap: 15px !important; margin-top: 0 !important; }
+            .search-bar { order: 4 !important; flex: 0 0 100% !important; width: 100% !important; margin-top: 15px !important; display: flex !important; justify-content: center !important; }
+            .search-bar input { width: 100% !important; padding: 10px 15px !important; border-radius: 25px !important; border: 1px solid #ccc !important; }
+            .main-nav { display: flex; flex-direction: row; flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; padding: 10px 15px; justify-content: flex-start; gap: 20px; }
             .main-nav::-webkit-scrollbar { display: none; }
-            
-            /* 3. Side-by-Side Product Grid */
-            /* NOTE: Make sure '.product-grid' matches the actual class name of your product container in your HTML! */
-            .product-grid { 
-                display: grid; 
-                grid-template-columns: 1fr 1fr; /* This is the magic line that creates 2 columns! */
-                gap: 10px; 
-                padding: 10px;
-            }
-            .product-card h3 { font-size: 13px; margin-top: 8px; } /* Shrinks text to fit the smaller cards */
+            .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
+            .product-card h3 { font-size: 13px; margin-top: 8px; }
             .product-card p { font-size: 14px; font-weight: bold; }
-            
-            /* 4. Fix Footer & Spacing */
-            footer { 
-                grid-template-columns: 1fr; 
-                text-align: center; 
-                padding: 30px 15px;
-            }
+            footer { grid-template-columns: 1fr; text-align: center; padding: 30px 15px; }
+            /* Admin specific mobile fixes */
+            body { flex-direction: column; padding: 10px; }
+            .admin-panel, .orders-panel { width: 100%; box-sizing: border-box; }
         }
     </style>
 </head>
@@ -197,10 +123,32 @@
     </div>
 
     <script>
-        let allProducts = [];
-        let currentMedia = []; // Stores images while editing so you can sort them
+        // --- SECURITY LOCK ---
+        // --- SECURITY LOCK (Server-Verified) ---
+        const adminPass = prompt("Enter Admin Password:");
+        
+        if (!adminPass) {
+            window.location.href = "website.html"; // Kicks them out if they hit cancel
+        } else {
+            // Ask the server if the password is correct
+            fetch('/api/verify-admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: adminPass })
+            }).then(res => {
+                if (!res.ok) {
+                    alert("Access Denied.");
+                    window.location.href = "website.html"; 
+                } else {
+                    // Password is correct! Save it to use for the other API calls
+                    sessionStorage.setItem("admin_pass", adminPass);
+                }
+            });
+        }
 
-        // 1. Fetch products
+        let allProducts = [];
+        let currentMedia = []; 
+
         async function fetchProductsForDropdown() {
             try {
                 const response = await fetch('/api/products');
@@ -220,7 +168,6 @@
             }
         }
 
-        // --- THE GALLERY RENDERER ---
         function renderGallery() {
             const gallery = document.getElementById('media-gallery');
             gallery.innerHTML = '';
@@ -258,7 +205,6 @@
             renderGallery();
         };
 
-        // 2. Change mode (New vs Edit)
         document.getElementById('mode-select').addEventListener('change', (e) => {
             const selectedId = e.target.value;
             const submitBtn = document.getElementById('submit-btn');
@@ -282,7 +228,6 @@
                 document.getElementById('sizes').value = productToEdit.sizes ? productToEdit.sizes.join(', ') : '';
                 document.getElementById('inStock').checked = productToEdit.inStock !== false;
 
-                // Load existing images into the gallery manager
                 currentMedia = productToEdit.media ? [...productToEdit.media] : [];
                 mediaManager.style.display = "block";
                 renderGallery();
@@ -292,7 +237,6 @@
             }
         });
 
-        // 3. Handle Submit
         document.getElementById('product-form').addEventListener('submit', async (e) => {
             e.preventDefault(); 
             const selectedMode = document.getElementById('mode-select').value;
@@ -311,7 +255,6 @@
                 formData.append('sizes', document.getElementById('sizes').value);
                 formData.append('inStock', document.getElementById('inStock').checked);
 
-                // Pass the custom sorted array back to the server
                 if (selectedMode !== 'new') {
                     if (currentMedia.length === 0) formData.append('existingMedia', '');
                     else currentMedia.forEach(url => formData.append('existingMedia', url));
@@ -325,8 +268,10 @@
                 const apiUrl = selectedMode === 'new' ? '/api/upload' : `/api/products/${selectedMode}`;
                 const fetchMethod = selectedMode === 'new' ? 'POST' : 'PUT';
 
+                // We hand the password to the bouncer here!
                 const response = await fetch(apiUrl, {
                     method: fetchMethod,
+                    headers: { 'admin-password': sessionStorage.getItem('admin_pass') },
                     body: formData 
                 });
 
@@ -337,7 +282,6 @@
                     
                     await fetchProductsForDropdown();
                     
-                    // Auto-refresh the gallery view if we just edited a product
                     if (selectedMode !== 'new') {
                         document.getElementById('mode-select').dispatchEvent(new Event('change'));
                     }
@@ -351,7 +295,6 @@
             setTimeout(() => statusMsg.innerText = "", 4000);
         });
 
-        // Delete Logic
         async function deleteProduct() {
             const selectedId = document.getElementById('mode-select').value;
             if (selectedId === 'new') return;
@@ -360,7 +303,12 @@
             if (!isSure) return;
 
             try {
-                const response = await fetch(`/api/products/${selectedId}`, { method: 'DELETE' });
+                // We hand the password to the bouncer here too!
+                const response = await fetch(`/api/products/${selectedId}`, { 
+                    method: 'DELETE',
+                    headers: { 'admin-password': sessionStorage.getItem('admin_pass') }
+                });
+                
                 if (response.ok) {
                     alert("Product permanently deleted from cloud.");
                     document.getElementById('mode-select').value = 'new';
@@ -372,7 +320,6 @@
             } catch (error) { alert("Server error while trying to delete."); }
         }
 
-        // 4. Fetch Orders
         async function fetchOrders() {
             try {
                 const response = await fetch('/api/orders');
@@ -455,9 +402,13 @@
 
         async function updateOrderStatus(orderId, newStatus) {
             try {
+                // Hand the password to the order status bouncer!
                 await fetch(`/api/orders/${orderId}/status`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'admin-password': sessionStorage.getItem('admin_pass') 
+                    },
                     body: JSON.stringify({ status: newStatus })
                 });
                 alert('Order status updated!');

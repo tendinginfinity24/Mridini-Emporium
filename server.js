@@ -85,6 +85,30 @@ app.get('/', (req, res) => {
 });
 
 // ==================
+// --- THE ADMIN BOUNCER ---
+// ==================
+// --- THE ADMIN BOUNCER ---
+const adminAuth = (req, res, next) => {
+    const password = req.headers['admin-password'];
+    // Now it checks the secret vault instead of a typed-out string!
+    if (password === process.env.ADMIN_PASSWORD) {
+        next(); 
+    } else {
+        res.status(401).json({ message: "Intruder alert! Incorrect password." });
+    }
+};
+
+// --- NEW: THE FRONT DOOR CHECKER ---
+// The HTML page will call this to verify the password safely
+app.post('/api/verify-admin', (req, res) => {
+    if (req.body.password === process.env.ADMIN_PASSWORD) {
+        res.json({ valid: true });
+    } else {
+        res.status(401).json({ valid: false });
+    }
+});
+
+// ==================
 // PRODUCT ROUTES
 // ==================
 
@@ -97,7 +121,8 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-app.post('/api/upload', upload.array('mediaFiles', 10), async (req, res) => {
+// Protected Route!
+app.post('/api/upload', adminAuth, upload.array('mediaFiles', 10), async (req, res) => {
     try {
         const { name, category, originalPrice, price, description, sizes, inStock } = req.body;
         const mediaUrls = req.files ? req.files.map(file => file.path || file.secure_url || file.url).filter(url => url) : [];
@@ -118,20 +143,19 @@ app.post('/api/upload', upload.array('mediaFiles', 10), async (req, res) => {
     }
 });
 
-// 🚨 UPGRADED PUT ROUTE: Now accepts custom image sorting!
-app.put('/api/products/:id', upload.array('mediaFiles', 10), async (req, res) => {
+// Protected Route!
+app.put('/api/products/:id', adminAuth, upload.array('mediaFiles', 10), async (req, res) => {
     try {
         const productId = parseInt(req.params.id);
         const existingProduct = await Product.findOne({ id: productId });
         if (!existingProduct) return res.status(404).json({ message: "Product not found!" });
 
-        // Logic to handle custom reordering and deleting from the frontend
         let keptMedia = [];
         if (req.body.existingMedia !== undefined) {
-            if (req.body.existingMedia === '') keptMedia = []; // All old images were deleted
+            if (req.body.existingMedia === '') keptMedia = []; 
             else keptMedia = Array.isArray(req.body.existingMedia) ? req.body.existingMedia : [req.body.existingMedia];
         } else {
-            keptMedia = existingProduct.media || []; // Fallback if not provided
+            keptMedia = existingProduct.media || []; 
         }
 
         const newMediaUrls = req.files ? req.files.map(file => file.path || file.secure_url || file.url).filter(url => url) : [];
@@ -151,7 +175,8 @@ app.put('/api/products/:id', upload.array('mediaFiles', 10), async (req, res) =>
     } catch (err) { res.status(500).json({ message: "Error updating product." }); }
 });
 
-app.delete('/api/products/:id', async (req, res) => {
+// Protected Route!
+app.delete('/api/products/:id', adminAuth, async (req, res) => {
     try {
         const deleted = await Product.findOneAndDelete({ id: parseInt(req.params.id) });
         if (!deleted) return res.status(404).json({ message: "Product not found!" });
@@ -176,7 +201,8 @@ app.post('/api/orders', async (req, res) => {
     } catch (err) { res.status(500).json({ message: "Error" }); }
 });
 
-app.put('/api/orders/:orderId/status', async (req, res) => {
+// Protected Route!
+app.put('/api/orders/:orderId/status', adminAuth, async (req, res) => {
     try { await Order.findOneAndUpdate({ orderId: req.params.orderId }, { status: req.body.status }); res.json({ message: "Updated!" }); } catch (err) { res.status(500).json({ message: "Error" }); }
 });
 
