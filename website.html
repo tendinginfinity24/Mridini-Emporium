@@ -77,6 +77,24 @@
             /* --- THE PERFECT CENTER MOBILE HEADER --- */
         /* --- THE PERFECT CENTER MOBILE HEADER --- */
             /* --- THE PERFECT CENTER MOBILE HEADER --- */
+
+            body, html {
+                width: 100% !important;
+                overflow-x: hidden !important; /* Stops any weird horizontal scrolling */
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+        /* Force the header and any main wrappers to take full width */
+            header, .wrapper, .container, .main-content {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+            }
+
             .top-bar { 
                 display: flex !important;
                 flex-wrap: wrap !important; /* Allows multiple rows */
