@@ -180,6 +180,40 @@
             }
             .product-card h3 { font-size: 13px; margin-top: 8px; } /* Shrinks text to fit the smaller cards */
             .product-card p { font-size: 14px; font-weight: bold; }
+
+            /* --- PRODUCT PAGE MOBILE --- */
+        /* Change the main container from row to column */
+        .product-detail-container, .single-product {
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 10px !important;
+        }
+
+        /* Make the image section take 100% width */
+        .product-image-section {
+            width: 100% !important;
+            margin-bottom: 20px !important;
+        }
+        .main-product-image {
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        /* Make the text/buttons section take 100% width underneath */
+        .product-info-section {
+            width: 100% !important;
+            padding-left: 0 !important; /* Removes the desktop spacing on the left */
+        }
+        
+        /* Make Add to Basket & Buy Now buttons stack or sit nicely */
+        .product-buttons {
+            display: flex !important;
+            flex-direction: column !important; /* Stacks the buttons */
+            gap: 10px !important;
+        }
+        .product-buttons button {
+            width: 100% !important; /* Makes buttons wide and easy to tap */
+        }
             
             /* 4. Fix Footer & Spacing */
             footer { 

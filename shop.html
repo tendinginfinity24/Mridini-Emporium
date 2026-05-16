@@ -147,11 +147,28 @@
             
             /* 3. Side-by-Side Product Grid */
             /* NOTE: Make sure '.product-grid' matches the actual class name of your product container in your HTML! */
-            .product-grid { 
-                display: grid; 
-                grid-template-columns: 1fr 1fr; /* This is the magic line that creates 2 columns! */
-                gap: 10px; 
-                padding: 10px;
+            /* --- SHOP PAGE MOBILE --- */
+        /* Change the main container from row to column */
+            .shop-container, .shop-layout { 
+                display: flex !important;
+                flex-direction: column !important; 
+                padding: 10px !important;
+            }
+            
+            /* Make the sidebar take the full width above the products */
+            .sidebar, .filter-sidebar {
+                width: 100% !important;
+                margin-bottom: 20px !important;
+                border-right: none !important; /* Removes the desktop divider line */
+                padding-right: 0 !important;
+            }
+
+            /* Force the products into 2 columns */
+            .product-grid {
+                width: 100% !important;
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important; /* 2 columns! */
+                gap: 10px !important;
             }
             .product-card h3 { font-size: 13px; margin-top: 8px; } /* Shrinks text to fit the smaller cards */
             .product-card p { font-size: 14px; font-weight: bold; }
