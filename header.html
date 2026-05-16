@@ -1,16 +1,20 @@
 <div class="top-bar">
-    <div class="search-bar">
-        <input type="text" id="global-search-input" placeholder="Search for Gowns, Suits, etc...">
-    </div>
+    <div class="hamburger" style="display: none; font-size: 28px; cursor: pointer;">☰</div>
+
     <div class="logo-container">
-        <a href="website.html"><img src="logo.png" alt="Mridini" class="logo-img" style="font-size: 24px; color: #a35d4d; letter-spacing: 4px; font-family: 'Georgia', serif;" onerror="this.style.display='none'; this.parentNode.innerText='MRIDINI';"></a>
+        <a href="website.html"><img src="logo.png" alt="Mridini" class="logo-img" style="font-size: 24px; color: black;"></a>
     </div>
+
     <div class="header-icons">
         <span id="user-display" style="font-size: 13px; color: #555; margin-right: 10px; display: none;">
             Hi, <span id="user-name"></span> | <a href="#" onclick="logoutUser()" style="text-decoration: underline;">Logout</a>
         </span>
         <a href="cart.html"><div class="icon-circle">🛒<div class="cart-count" id="global-cart-badge">0</div></div></a>
         <a href="login.html" id="user-profile-link"><div class="icon-circle">👤</div></a>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" id="global-search-input" placeholder="Search for Gowns, Suits, etc...">
     </div>
 </div>
 <nav class="main-nav">
