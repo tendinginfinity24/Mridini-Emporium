@@ -172,22 +172,18 @@
             /* --- SHOP PAGE MOBILE --- */
         /* Change the main container from row to column */
             /* --- SHOP PAGE MOBILE --- */
+        /* --- SHOP PAGE MOBILE --- */
         .shop-container, .shop-layout { 
             display: flex !important;
-            flex-direction: column !important; 
+            flex-direction: column !important; /* Stacks everything */
             padding: 10px !important;
         }
-        
-        /* Force the products to the TOP */
-        .products-section, .product-list, .main-content {
-            order: 1 !important; 
-            width: 100% !important;
-        }
 
-        /* Show and style the Filter Button */
+        /* 1. Style the Filter Button */
         .mobile-filter-btn {
             display: flex !important; 
-            width: 100%;
+            width: calc(100% - 30px); /* Centers it nicely on the screen */
+            margin: 10px auto 0 auto; 
             padding: 12px;
             justify-content: center;
             align-items: center;
@@ -198,32 +194,30 @@
             font-family: 'Georgia', serif;
             font-size: 16px;
             cursor: pointer;
-            margin-bottom: 20px;
         }
 
-        /* Hide the sidebar by default! */
-        .sidebar, .filter-sidebar {
-            display: none !important; /* This makes it invisible initially */
-            order: 2 !important; 
+        /* 2. Sidebar - Hidden by default, opens directly under the button! */
+        .sidebar {
+            display: none !important; /* Invisible initially */
             width: 100% !important;
-            margin-top: 10px !important; 
-            padding-top: 20px !important;
-            border-top: 1px solid #eee !important; 
+            padding-bottom: 20px !important;
+            border-bottom: 1px solid #eee !important; 
             border-right: none !important; 
-            padding-right: 0 !important;
+            margin-bottom: 20px !important; 
         }
 
-        /* The magic class that JS will add to reveal the filters */
-        .sidebar.show-filters, .filter-sidebar.show-filters {
+        /* The magic class that JS adds to reveal the filters */
+        .sidebar.show-filters {
             display: block !important;
         }
 
-        /* Products Grid */
+        /* 3. Products Grid */
         .product-grid {
             width: 100% !important;
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
             gap: 10px !important;
+            /* We removed the 'order' rules, so HTML handles the order naturally! */
         }
             
             /* 4. Fix Footer & Spacing */
@@ -233,6 +227,7 @@
                 padding: 30px 15px;
             }
         }
+
     </style>
 </head>
 <body>
