@@ -15,15 +15,30 @@ mongoose.connect(process.env.MONGO_URI, {
   .catch(err => console.error('Database connection failed:', err));
 
 // --- SCHEMAS ---
+const CommentSchema = new mongoose.Schema({
+    user: { type: String, default: 'Anonymous' },
+    text: { type: String, required: true },
+    reply: { type: String, default: '' },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const ColorVariantSchema = new mongoose.Schema({
+    colorName: { type: String, required: true },
+    media: [{ type: String }]
+});
+
 const productSchema = new mongoose.Schema({
     id: Number,
     name: String,
-    category: String,
+    categories: [String], // Array for multiple categories
+    category: String, // Fallback for old code
     originalPrice: Number,
     price: Number,
     description: String,
     sizes: [String],
-    media: [String],
+    media: [String], // Fallback for old single-array media
+    colors: [ColorVariantSchema], // New Color Mapping
+    comments: [CommentSchema], // New Q&A
     inStock: Boolean
 });
 const Product = mongoose.model('Product', productSchema);
@@ -87,10 +102,8 @@ app.get('/', (req, res) => {
 // ==================
 // --- THE ADMIN BOUNCER ---
 // ==================
-// --- THE ADMIN BOUNCER ---
 const adminAuth = (req, res, next) => {
     const password = req.headers['admin-password'];
-    // Now it checks the secret vault instead of a typed-out string!
     if (password === process.env.ADMIN_PASSWORD) {
         next(); 
     } else {
@@ -98,8 +111,6 @@ const adminAuth = (req, res, next) => {
     }
 };
 
-// --- NEW: THE FRONT DOOR CHECKER ---
-// The HTML page will call this to verify the password safely
 app.post('/api/verify-admin', (req, res) => {
     if (req.body.password === process.env.ADMIN_PASSWORD) {
         res.json({ valid: true });
@@ -121,67 +132,128 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-// Protected Route!
-app.post('/api/upload', adminAuth, upload.array('mediaFiles', 10), async (req, res) => {
+// Helper function to process color files
+const processColorData = (req) => {
+    let parsedColors = [];
+    if(req.body.colorData) {
+        const colorData = JSON.parse(req.body.colorData);
+        parsedColors = colorData.map((c, idx) => {
+            const files = req.files ? req.files.filter(f => f.fieldname === `media_color_${idx}`) : [];
+            const newMedia = files.map(f => f.path || f.secure_url || f.url);
+            return {
+                colorName: c.colorName || 'Standard',
+                media: [...(c.existingMedia || []), ...newMedia]
+            };
+        });
+    }
+    return parsedColors;
+};
+
+// Protected Upload Route
+app.post('/api/upload', adminAuth, upload.any(), async (req, res) => {
     try {
-        const { name, category, originalPrice, price, description, sizes, inStock } = req.body;
-        const mediaUrls = req.files ? req.files.map(file => file.path || file.secure_url || file.url).filter(url => url) : [];
+        const { name, categories, originalPrice, price, description, sizes, inStock } = req.body;
+        
+        let catArray = categories ? categories.split(',').map(s=>s.trim()) : [];
+        let parsedColors = processColorData(req);
+        let allMedia = parsedColors.flatMap(c => c.media); // Fallback for old systems
 
         const newProduct = new Product({
             id: Date.now(),
-            name, category, 
-            originalPrice: Number(originalPrice), price: Number(price),
-            description, sizes: sizes ? sizes.split(',') : [],
-            media: mediaUrls,
+            name, 
+            categories: catArray, 
+            category: catArray[0] || '', // Fallback
+            originalPrice: Number(originalPrice) || undefined, 
+            price: Number(price),
+            description, 
+            sizes: sizes ? sizes.split(',').map(s=>s.trim()) : [],
+            colors: parsedColors,
+            media: allMedia,
             inStock: inStock === 'true' || inStock === true
         });
 
         await newProduct.save();
         res.json({ message: "Product uploaded successfully!", product: newProduct });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: "Error uploading product." });
     }
 });
 
-// Protected Route!
-app.put('/api/products/:id', adminAuth, upload.array('mediaFiles', 10), async (req, res) => {
+// Protected Update Route
+app.put('/api/products/:id', adminAuth, upload.any(), async (req, res) => {
     try {
         const productId = parseInt(req.params.id);
         const existingProduct = await Product.findOne({ id: productId });
         if (!existingProduct) return res.status(404).json({ message: "Product not found!" });
 
-        let keptMedia = [];
-        if (req.body.existingMedia !== undefined) {
-            if (req.body.existingMedia === '') keptMedia = []; 
-            else keptMedia = Array.isArray(req.body.existingMedia) ? req.body.existingMedia : [req.body.existingMedia];
-        } else {
-            keptMedia = existingProduct.media || []; 
-        }
-
-        const newMediaUrls = req.files ? req.files.map(file => file.path || file.secure_url || file.url).filter(url => url) : [];
-        const combinedMedia = [...keptMedia, ...newMediaUrls].filter(url => url !== null && url !== undefined && url !== '');
+        let catArray = req.body.categories ? req.body.categories.split(',').map(s=>s.trim()) : existingProduct.categories;
+        let parsedColors = processColorData(req);
+        let allMedia = parsedColors.flatMap(c => c.media);
 
         const updated = await Product.findOneAndUpdate(
             { id: productId },
             {
-                name: req.body.name, originalPrice: parseFloat(req.body.originalPrice),
-                price: parseFloat(req.body.price), category: req.body.category,
-                media: combinedMedia, inStock: req.body.inStock === 'true' || req.body.inStock === true,
-                description: req.body.description, sizes: req.body.sizes ? req.body.sizes.split(',') : existingProduct.sizes
+                name: req.body.name, 
+                originalPrice: req.body.originalPrice ? parseFloat(req.body.originalPrice) : undefined,
+                price: parseFloat(req.body.price), 
+                categories: catArray,
+                category: catArray[0] || '',
+                colors: parsedColors,
+                media: allMedia, 
+                inStock: req.body.inStock === 'true' || req.body.inStock === true,
+                description: req.body.description, 
+                sizes: req.body.sizes ? req.body.sizes.split(',').map(s=>s.trim()) : existingProduct.sizes
             },
             { new: true }
         );
         res.json({ message: "Product updated!", product: updated });
-    } catch (err) { res.status(500).json({ message: "Error updating product." }); }
+    } catch (err) { 
+        console.error(err);
+        res.status(500).json({ message: "Error updating product." }); 
+    }
 });
 
-// Protected Route!
 app.delete('/api/products/:id', adminAuth, async (req, res) => {
     try {
         const deleted = await Product.findOneAndDelete({ id: parseInt(req.params.id) });
         if (!deleted) return res.status(404).json({ message: "Product not found!" });
         res.json({ message: "Product deleted successfully!" });
     } catch (err) { res.status(500).json({ message: "Error deleting product." }); }
+});
+
+// NEW: Post a Comment
+app.post('/api/products/:id/comments', async (req, res) => {
+    try {
+        const product = await Product.findOne({ id: parseInt(req.params.id) });
+        if(!product) return res.status(404).json({message: "Not found"});
+        
+        product.comments.push({
+            user: req.body.user || 'Anonymous',
+            text: req.body.text
+        });
+        await product.save();
+        res.json(product);
+    } catch(err) { res.status(500).json({error: "Failed to post comment"}); }
+});
+// NEW: Admin Reply to a Comment
+app.put('/api/products/:productId/comments/:commentId/reply', adminAuth, async (req, res) => {
+    try {
+        const product = await Product.findOne({ id: parseInt(req.params.productId) });
+        if (!product) return res.status(404).json({ message: "Product not found" });
+
+        // Mongoose automatically assigns _id to subdocuments like comments
+        const comment = product.comments.id(req.params.commentId);
+        if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+        comment.reply = req.body.reply;
+        await product.save();
+        
+        res.json({ message: "Reply posted successfully!", product });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Error replying to comment." });
+    }
 });
 
 // ==================
@@ -201,7 +273,6 @@ app.post('/api/orders', async (req, res) => {
     } catch (err) { res.status(500).json({ message: "Error" }); }
 });
 
-// Protected Route!
 app.put('/api/orders/:orderId/status', adminAuth, async (req, res) => {
     try { await Order.findOneAndUpdate({ orderId: req.params.orderId }, { status: req.body.status }); res.json({ message: "Updated!" }); } catch (err) { res.status(500).json({ message: "Error" }); }
 });
@@ -234,7 +305,6 @@ app.post('/api/login', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 8080;
-
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
 });

@@ -6,7 +6,7 @@
     <title>Store Admin</title>
     <style>
         body { font-family: sans-serif; background-color: #f4f4f4; padding: 40px; display: flex; justify-content: center; }
-        .admin-panel { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 500px; }
+        .admin-panel { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 600px; }
         h2 { text-align: center; color: #a35d4d; margin-top: 0; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #333; }
@@ -20,23 +20,17 @@
         .orders-panel { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 600px; margin-top: 30px;}
         .order-card { border: 1px solid #ccc; padding: 15px; border-radius: 4px; margin-bottom: 15px; background: #fafafa;}
         .order-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #a35d4d;}
-        .order-details { font-size: 14px; color: #333; line-height: 1.5;}
-        .order-items { margin-top: 10px; font-size: 13px; color: #555; background: white; padding: 10px; border: 1px dashed #ccc;}
-        /* --- MOBILE RESPONSIVENESS --- */
+        
+        /* New Colors Section */
+        .color-block { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; background: #fdfdfd; border-radius: 4px;}
+        .color-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .btn-remove-color { background: #d32f2f; padding: 5px 10px; font-size: 12px; margin: 0; width: auto; }
+        .mini-gallery { display: flex; gap: 10px; overflow-x: auto; margin-top: 10px; padding: 5px 0; }
+        .mini-thumb-container { position: relative; width: 60px; height: 80px; flex-shrink: 0; border: 1px solid #ccc; }
+        .mini-thumb-container img, .mini-thumb-container video { width: 100%; height: 100%; object-fit: cover; }
+        .btn-delete-thumb { position: absolute; top: -5px; right: -5px; background: #d32f2f; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; cursor: pointer; padding: 0; }
+        
         @media (max-width: 768px) {
-            .top-bar { display: flex !important; flex-wrap: wrap !important; align-items: center !important; justify-content: space-between !important; padding: 10px 15px !important; }
-            .hamburger { display: flex !important; order: 1 !important; flex: 1 1 30% !important; justify-content: flex-start !important; font-size: 28px !important; color: #333 !important; }
-            .logo-container { order: 2 !important; flex: 1 1 40% !important; display: flex !important; justify-content: center !important; }
-            .header-icons { order: 3 !important; flex: 1 1 30% !important; display: flex !important; justify-content: flex-end !important; gap: 15px !important; margin-top: 0 !important; }
-            .search-bar { order: 4 !important; flex: 0 0 100% !important; width: 100% !important; margin-top: 15px !important; display: flex !important; justify-content: center !important; }
-            .search-bar input { width: 100% !important; padding: 10px 15px !important; border-radius: 25px !important; border: 1px solid #ccc !important; }
-            .main-nav { display: flex; flex-direction: row; flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; padding: 10px 15px; justify-content: flex-start; gap: 20px; }
-            .main-nav::-webkit-scrollbar { display: none; }
-            .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
-            .product-card h3 { font-size: 13px; margin-top: 8px; }
-            .product-card p { font-size: 14px; font-weight: bold; }
-            footer { grid-template-columns: 1fr; text-align: center; padding: 30px 15px; }
-            /* Admin specific mobile fixes */
             body { flex-direction: column; padding: 10px; }
             .admin-panel, .orders-panel { width: 100%; box-sizing: border-box; }
         }
@@ -62,8 +56,9 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Category</label>
-                    <input type="text" id="category" required placeholder="e.g. Gowns, Suits...">
+                    <label>Categories</label>
+                    <input type="text" id="categories" required placeholder="e.g. Gowns, Suits, Best Sellers">
+                    <span class="hint">Separate multiple categories with commas.</span>
                 </div>
 
                 <div style="display: flex; gap: 10px;">
@@ -88,17 +83,12 @@
                     <textarea id="description" rows="4" placeholder="Fabric details, care instructions, etc..."></textarea>
                 </div>
 
-                <div id="existing-media-manager" style="display: none; margin-bottom: 20px; border-top: 1px solid #eee; padding-top: 15px;">
-                    <label>Manage Current Images</label>
-                    <span class="hint" style="margin-bottom: 10px;">Use arrows to arrange order. The leftmost image is the main display. Click X to delete.</span>
-                    <div id="media-gallery" style="display: flex; gap: 10px; overflow-x: auto; padding: 10px; background: #fafafa; border: 1px solid #ccc; border-radius: 4px; min-height: 120px;">
-                        </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Upload Media (Images & .mp4)</label>
-                    <input type="file" id="product-media" class="form-input" multiple accept="image/*,video/mp4,video/webm">
-                    <span class="hint" id="media-hint">Leave blank when editing an existing product to keep current images.</span>
+                <div class="form-group" style="border: 2px solid #e5ded2; padding: 15px; border-radius: 4px;">
+                    <label style="font-size: 16px; color: #a35d4d; border-bottom: 1px solid #e5ded2; padding-bottom: 5px; margin-bottom: 15px;">Color Variants & Media</label>
+                    
+                    <div id="colors-container"></div>
+                    
+                    <button type="button" onclick="addColorBlock()" style="background: #333; margin-top: 10px; font-size: 14px;">+ Add Color Variant</button>
                 </div>
 
                 <div class="form-group checkbox-group">
@@ -116,39 +106,97 @@
         
         <div class="orders-panel">
             <h2>Recent Orders</h2>
-            <div id="orders-list">
-                Loading orders...
-            </div>
+            <div id="orders-list">Loading orders...</div>
+        </div>
+        <div class="orders-panel">
+            <h2>Customer Q&A (Unanswered)</h2>
+            <div id="qa-list">Loading Q&A...</div>
         </div>
     </div>
 
     <script>
         // --- SECURITY LOCK ---
-        // --- SECURITY LOCK (Server-Verified) ---
         const adminPass = prompt("Enter Admin Password:");
-        
         if (!adminPass) {
-            window.location.href = "website.html"; // Kicks them out if they hit cancel
+            window.location.href = "website.html"; 
         } else {
-            // Ask the server if the password is correct
             fetch('/api/verify-admin', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: adminPass })
             }).then(res => {
-                if (!res.ok) {
-                    alert("Access Denied.");
-                    window.location.href = "website.html"; 
-                } else {
-                    // Password is correct! Save it to use for the other API calls
-                    sessionStorage.setItem("admin_pass", adminPass);
-                }
+                if (!res.ok) { alert("Access Denied."); window.location.href = "website.html"; } 
+                else { sessionStorage.setItem("admin_pass", adminPass); }
             });
         }
 
         let allProducts = [];
-        let currentMedia = []; 
+        let colorBlocksData = []; // Holds the state of our colors UI
 
+        // --- COLOR UI LOGIC ---
+        function generateBlockId() { return Math.random().toString(36).substring(7); }
+
+        function addColorBlock(colorName = '', existingMedia = []) {
+            colorBlocksData.push({ id: generateBlockId(), colorName, existingMedia });
+            renderColors();
+        }
+
+        function removeColorBlock(id) {
+            colorBlocksData = colorBlocksData.filter(b => b.id !== id);
+            renderColors();
+        }
+
+        function removeColorMedia(blockId, mediaIndex) {
+            const block = colorBlocksData.find(b => b.id === blockId);
+            if(block) {
+                block.existingMedia.splice(mediaIndex, 1);
+                renderColors();
+            }
+        }
+
+        function updateColorName(blockId, value) {
+            const block = colorBlocksData.find(b => b.id === blockId);
+            if(block) block.colorName = value;
+        }
+
+        function renderColors() {
+            const container = document.getElementById('colors-container');
+            container.innerHTML = '';
+            
+            if(colorBlocksData.length === 0) {
+                container.innerHTML = '<p style="font-size:12px; color:#777;">No colors added. Click the button below.</p>';
+                return;
+            }
+
+            colorBlocksData.forEach((block, index) => {
+                let mediaHtml = '';
+                if (block.existingMedia && block.existingMedia.length > 0) {
+                    mediaHtml = `<div class="mini-gallery">` + block.existingMedia.map((url, mIdx) => {
+                        const isVid = url.toLowerCase().endsWith('.mp4');
+                        return `
+                        <div class="mini-thumb-container">
+                            ${isVid ? `<video src="${url}"></video>` : `<img src="${url}">`}
+                            <button type="button" class="btn-delete-thumb" onclick="removeColorMedia('${block.id}', ${mIdx})">X</button>
+                        </div>`;
+                    }).join('') + `</div>`;
+                }
+
+                container.insertAdjacentHTML('beforeend', `
+                    <div class="color-block">
+                        <div class="color-header">
+                            <strong>${index === 0 ? 'Primary Color / Default' : 'Variant ' + (index + 1)}</strong>
+                            ${index > 0 ? `<button type="button" class="btn-remove-color" onclick="removeColorBlock('${block.id}')">Remove</button>` : ''}
+                        </div>
+                        <input type="text" value="${block.colorName}" onkeyup="updateColorName('${block.id}', this.value)" placeholder="e.g. Standard, Ruby Red, Emerald" style="margin-bottom: 10px;" required>
+                        <input type="file" id="file_${block.id}" multiple accept="image/*,video/mp4,video/webm">
+                        <span class="hint">Select new images for this color.</span>
+                        ${mediaHtml}
+                    </div>
+                `);
+            });
+        }
+
+        // --- CORE LOGIC ---
         async function fetchProductsForDropdown() {
             try {
                 const response = await fetch('/api/products');
@@ -156,83 +204,48 @@
                 
                 const selectEl = document.getElementById('mode-select');
                 selectEl.innerHTML = '<option value="new">-- ✨ Create New Product ✨ --</option>';
-                
-                allProducts.forEach(product => {
+                allProducts.forEach(p => {
                     const option = document.createElement('option');
-                    option.value = product.id;
-                    option.textContent = `Edit: ${product.name}`;
+                    option.value = p.id;
+                    option.textContent = `Edit: ${p.name}`;
                     selectEl.appendChild(option);
                 });
-            } catch (error) {
-                console.error("Could not load products", error);
-            }
+            } catch (error) { console.error(error); }
         }
-
-        function renderGallery() {
-            const gallery = document.getElementById('media-gallery');
-            gallery.innerHTML = '';
-            
-            if (currentMedia.length === 0) {
-                gallery.innerHTML = '<span style="color:#777; font-size:13px; margin: auto;">No images saved to cloud.</span>';
-                return;
-            }
-
-            currentMedia.forEach((url, index) => {
-                const item = document.createElement('div');
-                item.style.cssText = "position: relative; min-width: 80px; width: 80px; height: 120px; border: 1px solid #ccc; background: white; flex-shrink: 0;";
-                const mediaHtml = url.toLowerCase().endsWith('.mp4') 
-                    ? `<video src="${url}" style="width:100%; height:100%; object-fit:cover;"></video>` 
-                    : `<img src="${url}" style="width:100%; height:100%; object-fit:cover;">`;
-                
-                item.innerHTML = `
-                    ${mediaHtml}
-                    <button type="button" onclick="removeMedia(${index})" style="position:absolute; top:-8px; right:-8px; background:#d32f2f; color:white; border:none; border-radius:50%; width:22px; height:22px; cursor:pointer; font-weight:bold; font-size:12px; z-index:2; padding:0;">X</button>
-                    <div style="position:absolute; bottom:0; left:0; width:100%; display:flex; justify-content:space-between; background:rgba(0,0,0,0.6); padding: 2px 0;">
-                        <button type="button" onclick="moveMedia(${index}, -1)" style="color:white; background:none; border:none; cursor:pointer; width:50%; font-weight:bold; padding:0;">&lt;</button>
-                        <button type="button" onclick="moveMedia(${index}, 1)" style="color:white; background:none; border:none; cursor:pointer; width:50%; font-weight:bold; padding:0;">&gt;</button>
-                    </div>
-                `;
-                gallery.appendChild(item);
-            });
-        }
-
-        window.removeMedia = (idx) => { currentMedia.splice(idx, 1); renderGallery(); };
-        window.moveMedia = (idx, dir) => {
-            if (idx + dir < 0 || idx + dir >= currentMedia.length) return;
-            const temp = currentMedia[idx];
-            currentMedia[idx] = currentMedia[idx + dir];
-            currentMedia[idx + dir] = temp;
-            renderGallery();
-        };
 
         document.getElementById('mode-select').addEventListener('change', (e) => {
             const selectedId = e.target.value;
             const submitBtn = document.getElementById('submit-btn');
             const deleteBtn = document.getElementById('delete-btn');
-            const mediaManager = document.getElementById('existing-media-manager');
+            
+            colorBlocksData = []; // reset
 
             if (selectedId === 'new') {
                 document.getElementById('product-form').reset();
                 submitBtn.innerText = "Upload New Product";
                 deleteBtn.style.display = "none";
-                mediaManager.style.display = "none";
-                currentMedia = [];
+                addColorBlock(); // Add one default block
             } else {
-                const productToEdit = allProducts.find(p => p.id == selectedId);
-                
-                document.getElementById('name').value = productToEdit.name || '';
-                document.getElementById('category').value = productToEdit.category || '';
-                document.getElementById('originalPrice').value = productToEdit.originalPrice || '';
-                document.getElementById('price').value = productToEdit.price || '';
-                document.getElementById('description').value = productToEdit.description || '';
-                document.getElementById('sizes').value = productToEdit.sizes ? productToEdit.sizes.join(', ') : '';
-                document.getElementById('inStock').checked = productToEdit.inStock !== false;
+                const product = allProducts.find(p => p.id == selectedId);
+                document.getElementById('name').value = product.name || '';
+                // Fallback support for old singular category data
+                document.getElementById('categories').value = (product.categories && product.categories.length > 0) ? product.categories.join(', ') : (product.category || '');
+                document.getElementById('originalPrice').value = product.originalPrice || '';
+                document.getElementById('price').value = product.price || '';
+                document.getElementById('description').value = product.description || '';
+                document.getElementById('sizes').value = product.sizes ? product.sizes.join(', ') : '';
+                document.getElementById('inStock').checked = product.inStock !== false;
 
-                currentMedia = productToEdit.media ? [...productToEdit.media] : [];
-                mediaManager.style.display = "block";
-                renderGallery();
+                // Load colors or fallback to old media array
+                if(product.colors && product.colors.length > 0) {
+                    product.colors.forEach(c => addColorBlock(c.colorName, [...c.media]));
+                } else if(product.media && product.media.length > 0) {
+                    addColorBlock('Standard', [...product.media]);
+                } else {
+                    addColorBlock();
+                }
 
-                submitBtn.innerText = "Save Changes & Images";
+                submitBtn.innerText = "Save Changes";
                 deleteBtn.style.display = "block";
             }
         });
@@ -248,27 +261,29 @@
             try {
                 const formData = new FormData();
                 formData.append('name', document.getElementById('name').value);
-                formData.append('category', document.getElementById('category').value);
+                formData.append('categories', document.getElementById('categories').value);
                 formData.append('originalPrice', document.getElementById('originalPrice').value);
                 formData.append('price', document.getElementById('price').value);
                 formData.append('description', document.getElementById('description').value);
                 formData.append('sizes', document.getElementById('sizes').value);
                 formData.append('inStock', document.getElementById('inStock').checked);
 
-                if (selectedMode !== 'new') {
-                    if (currentMedia.length === 0) formData.append('existingMedia', '');
-                    else currentMedia.forEach(url => formData.append('existingMedia', url));
-                }
-
-                const fileInput = document.getElementById('product-media');
-                for (let i = 0; i < fileInput.files.length; i++) {
-                    formData.append('mediaFiles', fileInput.files[i]);
-                }
+                // Build Color Data JSON & append files dynamically
+                let colorMeta = [];
+                colorBlocksData.forEach((block, index) => {
+                    colorMeta.push({ colorName: block.colorName || 'Standard', existingMedia: block.existingMedia });
+                    const fileInput = document.getElementById(`file_${block.id}`);
+                    if(fileInput && fileInput.files) {
+                        for(let i=0; i < fileInput.files.length; i++) {
+                            formData.append(`media_color_${index}`, fileInput.files[i]);
+                        }
+                    }
+                });
+                formData.append('colorData', JSON.stringify(colorMeta));
 
                 const apiUrl = selectedMode === 'new' ? '/api/upload' : `/api/products/${selectedMode}`;
                 const fetchMethod = selectedMode === 'new' ? 'POST' : 'PUT';
 
-                // We hand the password to the bouncer here!
                 const response = await fetch(apiUrl, {
                     method: fetchMethod,
                     headers: { 'admin-password': sessionStorage.getItem('admin_pass') },
@@ -276,18 +291,15 @@
                 });
 
                 if (response.ok) {
-                    statusMsg.innerText = selectedMode === 'new' ? "Product uploaded successfully!" : "Product and images updated!";
+                    statusMsg.innerText = selectedMode === 'new' ? "Product uploaded successfully!" : "Product updated!";
                     statusMsg.style.color = "green";
-                    if (selectedMode === 'new') document.getElementById('product-form').reset();
-                    
-                    await fetchProductsForDropdown();
-                    
-                    if (selectedMode !== 'new') {
-                        document.getElementById('mode-select').dispatchEvent(new Event('change'));
+                    if (selectedMode === 'new') {
+                        document.getElementById('product-form').reset();
+                        colorBlocksData = []; addColorBlock();
                     }
-                } else {
-                    throw new Error('Upload failed');
-                }
+                    await fetchProductsForDropdown();
+                    if (selectedMode !== 'new') document.getElementById('mode-select').dispatchEvent(new Event('change'));
+                } else throw new Error();
             } catch (error) {
                 statusMsg.innerText = "Error saving product. Check server terminal.";
                 statusMsg.style.color = "red";
@@ -298,128 +310,134 @@
         async function deleteProduct() {
             const selectedId = document.getElementById('mode-select').value;
             if (selectedId === 'new') return;
-
-            const isSure = confirm("🚨 Are you absolutely sure you want to delete this product? This cannot be undone.");
-            if (!isSure) return;
+            if (!confirm("🚨 Are you absolutely sure you want to delete this product?")) return;
 
             try {
-                // We hand the password to the bouncer here too!
                 const response = await fetch(`/api/products/${selectedId}`, { 
                     method: 'DELETE',
                     headers: { 'admin-password': sessionStorage.getItem('admin_pass') }
                 });
-                
                 if (response.ok) {
-                    alert("Product permanently deleted from cloud.");
+                    alert("Product permanently deleted.");
                     document.getElementById('mode-select').value = 'new';
                     document.getElementById('mode-select').dispatchEvent(new Event('change')); 
                     fetchProductsForDropdown();
-                } else {
-                    alert("Failed to delete product from database.");
                 }
-            } catch (error) { alert("Server error while trying to delete."); }
+            } catch (error) { alert("Server error."); }
         }
 
+        // --- ORDER MANAGEMENT ---
         async function fetchOrders() {
             try {
                 const response = await fetch('/api/orders');
                 const orders = await response.json();
-                const ordersContainer = document.getElementById('orders-list');
+                const container = document.getElementById('orders-list');
                 
-                if (orders.length === 0) return ordersContainer.innerHTML = "<p>No orders received yet.</p>";
-
-                ordersContainer.innerHTML = '';
+                if (orders.length === 0) return container.innerHTML = "<p>No orders yet.</p>";
+                container.innerHTML = '';
                 
                 for (let i = orders.length - 1; i >= 0; i--) {
                     const order = orders[i];
-                    const cart = order.cart || [];
-                    const customer = order.customer || {};
-                    const total = order.total || 0;
+                    const itemsHtml = (order.cart || []).map(item => `<div>${item.qty||1}x ${item.name} (Size: ${item.size})</div>`).join('');
+                    const c = order.customer || {};
                     
-                    let itemsHtml = cart.map(item => `<div>${item.qty || 1}x ${item.name} (Size: ${item.size})</div>`).join('');
-
-                    const customerDetailsHtml = `
-                        <strong>Customer:</strong> ${customer.firstName || 'N/A'} ${customer.lastName || ''} <br>
-                        <strong>Phone:</strong> <a href="tel:${customer.phone || ''}" style="color: #1976d2;">${customer.phone || 'N/A'}</a> <br>
-                        <strong>Email:</strong> <a href="mailto:${customer.email || ''}" style="color: #1976d2;">${customer.email || 'N/A'}</a> <br>
-                        <strong>Address:</strong> ${customer.address || 'N/A'}, ${customer.city || ''}, ${customer.state || ''} - ${customer.pincode || ''} <br>
-                        <strong>Total:</strong> ₹${total.toFixed(2)}
-                    `;
-
-                    let cancellationAlert = '';
-                    if (order.cancellationReason) {
-                        let safeVideoUrl = order.videoUrl || '';
-                        if (safeVideoUrl && !safeVideoUrl.startsWith('http')) safeVideoUrl = 'http://localhost:3000' + safeVideoUrl;
-
-                        cancellationAlert = `
-                            <div style="margin-top: 15px; padding: 15px; background-color: #fce4e4; border: 1px solid #f8b4b4; border-radius: 4px;">
-                                <div style="color: #d32f2f; font-weight: bold; margin-bottom: 5px;">⚠️ Cancellation/Return Requested</div>
-                                <div style="font-size: 13px; color: #555; margin-bottom: 10px;"><strong>Reason:</strong> ${order.cancellationReason}</div>
-                                
-                                ${safeVideoUrl ? `
-                                <div style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 4px; border: 1px dashed #ccc;">
-                                    <a href="${safeVideoUrl}" target="_blank" style="font-size: 13px; color: #1976d2; font-weight: bold;">🔗 Open Video Directly</a>
-                                </div>
-                                <video width="100%" controls preload="none" style="max-height: 300px; background: #000; border-radius: 4px; margin-bottom: 15px;">
-                                    <source src="${safeVideoUrl}" type="video/mp4">
-                                </video>
-                                ` : `
-                                <div style="padding: 10px; background: #fff; color: #d32f2f; font-size: 13px; border: 1px dashed #d32f2f; border-radius: 4px; margin-bottom: 15px;">
-                                    ❌ No video URL saved.
-                                </div>
-                                `}
-                                
-                                <div style="display: flex; gap: 10px;">
-                                    <button onclick="updateOrderStatus('${order.orderId}', 'Cancelled')" style="flex: 1; padding: 10px; background: #2e7d32; color: white;">✓ Approve</button>
-                                    <button onclick="updateOrderStatus('${order.orderId}', 'Delivered')" style="flex: 1; padding: 10px; background: #d32f2f; color: white;">✕ Reject</button>
-                                </div>
+                    let alertHtml = '';
+                    if(order.cancellationReason) {
+                        let safeVid = order.videoUrl ? (order.videoUrl.startsWith('http') ? order.videoUrl : 'http://localhost:3000'+order.videoUrl) : null;
+                        alertHtml = `
+                            <div style="margin-top: 10px; padding: 10px; background: #fce4e4; border: 1px solid #f8b4b4;">
+                                <strong>⚠️ Return Request:</strong> ${order.cancellationReason} <br>
+                                ${safeVid ? `<a href="${safeVid}" target="_blank" style="color:blue;">🔗 Open Video</a>` : ''}
                             </div>
                         `;
                     }
 
-                    ordersContainer.innerHTML += `
+                    container.innerHTML += `
                         <div class="order-card">
                             <div class="order-header">
                                 <span>${order.orderId}</span>
-                                <select onchange="updateOrderStatus('${order.orderId}', this.value)" style="width: auto; padding: 2px;">
-                                    <option value="Processing" ${order.status === 'Processing' ? 'selected' : ''}>Processing</option>
-                                    <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
-                                    <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-                                    <option value="Cancellation Requested" ${order.status === 'Cancellation Requested' ? 'selected' : ''}>Cancellation Requested</option>
-                                    <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                                <select onchange="updateOrderStatus('${order.orderId}', this.value)">
+                                    <option value="Processing" ${order.status==='Processing'?'selected':''}>Processing</option>
+                                    <option value="Shipped" ${order.status==='Shipped'?'selected':''}>Shipped</option>
+                                    <option value="Delivered" ${order.status==='Delivered'?'selected':''}>Delivered</option>
+                                    <option value="Cancelled" ${order.status==='Cancelled'?'selected':''}>Cancelled</option>
                                 </select>
                             </div>
-                            <div class="order-details">${customerDetailsHtml}</div>
-                            <div class="order-items" style="margin-top:10px; font-size:12px;">${itemsHtml}</div>
-                            ${cancellationAlert}
+                            <div style="font-size:13px;">
+                                ${c.firstName||''} ${c.lastName||''} | ${c.phone||''} | ${c.city||''}<br>
+                                <strong>Total: ₹${(order.total||0).toFixed(2)}</strong>
+                            </div>
+                            <div style="margin-top:5px; font-size:12px; border:1px dashed #ccc; padding:5px;">${itemsHtml}</div>
+                            ${alertHtml}
                         </div>
                     `;
                 }
-            } catch (error) { 
-                console.error("Failed to load orders:", error); 
-            }
+            } catch (e) {}
         }
 
         async function updateOrderStatus(orderId, newStatus) {
             try {
-                // Hand the password to the order status bouncer!
                 await fetch(`/api/orders/${orderId}/status`, {
                     method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'admin-password': sessionStorage.getItem('admin_pass') 
-                    },
+                    headers: { 'Content-Type': 'application/json', 'admin-password': sessionStorage.getItem('admin_pass') },
                     body: JSON.stringify({ status: newStatus })
                 });
-                alert('Order status updated!');
+                alert('Status updated!');
                 fetchOrders(); 
-            } catch (error) {
-                alert('Failed to update status.');
-            }
+            } catch (e) { alert('Failed to update.'); }
         }
 
+        // --- Q&A MANAGEMENT ---
+        async function fetchQA() {
+            try {
+                const response = await fetch('/api/products');
+                const products = await response.json();
+                const qaContainer = document.getElementById('qa-list');
+                let qaHtml = '';
+
+                products.forEach(p => {
+                    if (p.comments && p.comments.length > 0) {
+                        p.comments.forEach(c => {
+                            if (!c.reply) { // Only show comments without an admin reply
+                                qaHtml += `
+                                <div class="order-card" style="margin-bottom:10px;">
+                                    <div style="font-size:12px; color:#777;"><strong>Item:</strong> ${p.name} | <strong>User:</strong> ${c.user} | ${new Date(c.createdAt).toLocaleDateString()}</div>
+                                    <p style="margin:8px 0; font-size:14px;"><strong>Q:</strong> ${c.text}</p>
+                                    <div style="display:flex; gap:10px; margin-top:10px;">
+                                        <input type="text" id="reply-${c._id}" placeholder="Type your official response..." style="flex:1; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                                        <button onclick="postReply(${p.id}, '${c._id}')" style="width:auto; padding:8px 15px; margin:0; background-color:#333;">Post Reply</button>
+                                    </div>
+                                </div>`;
+                            }
+                        });
+                    }
+                });
+                qaContainer.innerHTML = qaHtml || '<p style="font-size:14px; color:#777;">No pending questions. You are all caught up!</p>';
+            } catch (e) { console.error("Error fetching QA", e); }
+        }
+
+        async function postReply(productId, commentId) {
+            const replyText = document.getElementById(`reply-${commentId}`).value.trim();
+            if(!replyText) return alert("Reply cannot be empty.");
+
+            try {
+                const res = await fetch(`/api/products/${productId}/comments/${commentId}/reply`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'admin-password': sessionStorage.getItem('admin_pass') },
+                    body: JSON.stringify({ reply: replyText })
+                });
+                if(res.ok) {
+                    alert('Response posted successfully!');
+                    fetchQA(); // Refresh the list
+                } else { alert('Failed to post reply.'); }
+            } catch (e) { alert('Error posting reply.'); }
+        }
+
+        // Initialize UI
         fetchProductsForDropdown();
         fetchOrders();
+        fetchQA();
+        addColorBlock(); // Add an empty block for "New Product" view
     </script>
 </body>
 </html>
