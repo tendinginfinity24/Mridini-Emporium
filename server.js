@@ -30,15 +30,16 @@ const ColorVariantSchema = new mongoose.Schema({
 const productSchema = new mongoose.Schema({
     id: Number,
     name: String,
-    categories: [String], // Array for multiple categories
-    category: String, // Fallback for old code
+    categories: [String], 
+    category: String, 
     originalPrice: Number,
     price: Number,
     description: String,
     sizes: [String],
-    media: [String], // Fallback for old single-array media
-    colors: [ColorVariantSchema], // New Color Mapping
-    comments: [CommentSchema], // New Q&A
+    media: [String], 
+    colors: [ColorVariantSchema], 
+    comments: [CommentSchema], 
+    instaReel: String, // Added Instagram Reel Support
     inStock: Boolean
 });
 const Product = mongoose.model('Product', productSchema);
@@ -132,7 +133,6 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-// Helper function to process color files
 const processColorData = (req) => {
     let parsedColors = [];
     if(req.body.colorData) {
@@ -149,26 +149,26 @@ const processColorData = (req) => {
     return parsedColors;
 };
 
-// Protected Upload Route
 app.post('/api/upload', adminAuth, upload.any(), async (req, res) => {
     try {
-        const { name, categories, originalPrice, price, description, sizes, inStock } = req.body;
+        const { name, categories, originalPrice, price, description, sizes, inStock, instaReel } = req.body;
         
         let catArray = categories ? categories.split(',').map(s=>s.trim()) : [];
         let parsedColors = processColorData(req);
-        let allMedia = parsedColors.flatMap(c => c.media); // Fallback for old systems
+        let allMedia = parsedColors.flatMap(c => c.media); 
 
         const newProduct = new Product({
             id: Date.now(),
             name, 
             categories: catArray, 
-            category: catArray[0] || '', // Fallback
+            category: catArray[0] || '', 
             originalPrice: Number(originalPrice) || undefined, 
             price: Number(price),
             description, 
             sizes: sizes ? sizes.split(',').map(s=>s.trim()) : [],
             colors: parsedColors,
             media: allMedia,
+            instaReel,
             inStock: inStock === 'true' || inStock === true
         });
 
@@ -180,7 +180,6 @@ app.post('/api/upload', adminAuth, upload.any(), async (req, res) => {
     }
 });
 
-// Protected Update Route
 app.put('/api/products/:id', adminAuth, upload.any(), async (req, res) => {
     try {
         const productId = parseInt(req.params.id);
@@ -201,11 +200,12 @@ app.put('/api/products/:id', adminAuth, upload.any(), async (req, res) => {
                 category: catArray[0] || '',
                 colors: parsedColors,
                 media: allMedia, 
+                instaReel: req.body.instaReel,
                 inStock: req.body.inStock === 'true' || req.body.inStock === true,
                 description: req.body.description, 
                 sizes: req.body.sizes ? req.body.sizes.split(',').map(s=>s.trim()) : existingProduct.sizes
             },
-            { new: true }
+            { returnDocument: 'after' } // Fixed Mongoose Deprecation Warning
         );
         res.json({ message: "Product updated!", product: updated });
     } catch (err) { 
@@ -222,7 +222,6 @@ app.delete('/api/products/:id', adminAuth, async (req, res) => {
     } catch (err) { res.status(500).json({ message: "Error deleting product." }); }
 });
 
-// NEW: Post a Comment
 app.post('/api/products/:id/comments', async (req, res) => {
     try {
         const product = await Product.findOne({ id: parseInt(req.params.id) });
@@ -236,13 +235,12 @@ app.post('/api/products/:id/comments', async (req, res) => {
         res.json(product);
     } catch(err) { res.status(500).json({error: "Failed to post comment"}); }
 });
-// NEW: Admin Reply to a Comment
+
 app.put('/api/products/:productId/comments/:commentId/reply', adminAuth, async (req, res) => {
     try {
         const product = await Product.findOne({ id: parseInt(req.params.productId) });
         if (!product) return res.status(404).json({ message: "Product not found" });
 
-        // Mongoose automatically assigns _id to subdocuments like comments
         const comment = product.comments.id(req.params.commentId);
         if (!comment) return res.status(404).json({ message: "Comment not found" });
 

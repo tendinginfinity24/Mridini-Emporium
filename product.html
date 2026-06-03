@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details - Mridini</title>
     <style>
-        /* Base & Header */
         body { font-family: 'Georgia', serif; margin: 0; padding: 0; color: #333; line-height: 1.6; }
         a { text-decoration: none; color: inherit; }
         ul { list-style: none; padding: 0; margin: 0; }
@@ -20,20 +19,16 @@
         .main-nav { display: flex; justify-content: center; gap: 30px; padding: 15px 0; font-size: 15px; border-bottom: 1px solid #f0f0f0; }
         .main-nav a:hover { color: #a35d4d; }
 
-        /* --- Product Page Layout --- */
         .product-layout { display: flex; gap: 40px; max-width: 1200px; margin: 40px auto; padding: 0 20px; }
 
-        /* ZOOM WRAPPER */
         .zoom-wrapper { width: 100%; aspect-ratio: 9 / 16; overflow: hidden; cursor: crosshair; border-radius: 4px; background-color: #f4f4f4; position: relative; }
         .zoom-wrapper img, .zoom-wrapper video { width: 100%; height: 100%; object-fit: cover; transition: transform 0.1s ease-out; }
 
-        /* Left Side: Gallery */
         .gallery-container { flex: 1; display: flex; flex-direction: column; gap: 15px; max-width: 50%; }
         .thumbnail-row { display: flex; gap: 10px; overflow-x: auto; }
         .thumb { width: 80px; height: 120px; object-fit: cover; cursor: pointer; border: 2px solid transparent; opacity: 0.6; }
         .thumb.active { border-color: #a35d4d; opacity: 1; }
 
-        /* Right Side: Details */
         .details-container { flex: 1; padding-top: 20px; }
         .breadcrumb { font-size: 12px; color: #777; margin-bottom: 15px; }
         .product-title { font-size: 28px; color: #333; margin-bottom: 15px; font-weight: normal; }
@@ -41,27 +36,23 @@
         .scratched-price { text-decoration: line-through; color: #999; font-size: 18px; }
         .selling-price { color: #a35d4d; font-size: 24px; font-weight: bold; }
 
-        /* Selectors (Sizes & Colors) */
         .selector-section { margin-bottom: 25px; }
         .selector-label { font-size: 14px; margin-bottom: 10px; display: block; color: #555; }
         .selector-options { display: flex; flex-wrap: wrap; gap: 10px; }
         .selector-btn { padding: 8px 15px; border: 1px solid #ccc; border-radius: 20px; background: white; font-family: sans-serif; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .selector-btn.selected { border-color: #a35d4d; background: #a35d4d; color: white; }
 
-        /* Actions */
         .action-row { display: flex; gap: 15px; margin-bottom: 40px; }
         .qty-input { width: 60px; padding: 12px; border: 1px solid #ccc; text-align: center; font-size: 16px; border-radius: 4px; }
         .btn-add { flex: 1; background-color: #d1b8a4; color: white; border: none; font-weight: bold; font-family: sans-serif; cursor: pointer; letter-spacing: 1px; border-radius: 4px; }
         .btn-buy { flex: 1; background-color: #333; color: white; border: none; font-weight: bold; font-family: sans-serif; cursor: pointer; letter-spacing: 1px; border-radius: 4px; }
         .btn-add:hover, .btn-buy:hover { filter: brightness(0.9); }
 
-        /* Tabs & Description */
         .tabs { border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 15px 0; display: flex; gap: 30px; font-size: 13px; font-weight: bold; font-family: sans-serif; margin-bottom: 20px;}
         .tab { cursor: pointer; color: #777; }
         .tab.active { color: #333; border-bottom: 2px solid #333; padding-bottom: 14px; }
         .description-content { font-size: 14px; color: #555; line-height: 1.8; }
 
-        /* NEW: Comments Section */
         .comments-section { max-width: 1200px; margin: 60px auto 20px auto; padding: 40px 20px; border-top: 1px solid #eee; }
         .comments-title { font-size: 20px; margin-bottom: 20px; font-weight: normal; letter-spacing: 1px;}
         .comment-form { display: flex; flex-direction: column; gap: 10px; max-width: 600px; margin-bottom: 40px; }
@@ -71,7 +62,6 @@
         .comment-meta { font-size: 12px; color: #777; margin-bottom: 8px; display: flex; justify-content: space-between;}
         .comment-reply { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ddd; font-size: 13px; color: #555;}
 
-        /* Related Products */
         .related-section { max-width: 1200px; margin: 40px auto 80px auto; padding: 0 20px; }
         .related-title { text-align: center; font-size: 20px; letter-spacing: 2px; margin-bottom: 40px; }
         .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
@@ -132,7 +122,7 @@
         window.currentSlideIndex = 0;
         window.productMediaArray = [];
         window.currentSelectedColorName = 'Standard';
-        window.globalProductData = null; // Store product globally for comments
+        window.globalProductData = null; 
 
         function handleZoom(e) {
             const wrapper = e.currentTarget;
@@ -182,7 +172,6 @@
             }
         }
 
-        // --- NEW: COLOR SELECTION LOGIC ---
         function selectColorIndex(idx, btn) {
             document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
@@ -192,7 +181,6 @@
 
             let mediaUrls = colorObj.media;
             
-            // Fallback: If a color has no images uploaded, show a placeholder instead of breaking
             if (!mediaUrls || mediaUrls.length === 0) {
                 mediaUrls = ["https://via.placeholder.com/1080x1920?text=No+Image+For+" + encodeURIComponent(colorObj.colorName)];
             }
@@ -200,7 +188,6 @@
             window.productMediaArray = mediaUrls;
             window.currentSlideIndex = 0;
 
-            // Rebuild Thumbnails
             const thumbContainer = document.querySelector('.thumbnail-row');
             thumbContainer.innerHTML = mediaUrls.map((url, index) => {
                 const isVid = String(url).toLowerCase().endsWith('.mp4');
@@ -209,7 +196,6 @@
                 return `<img class="thumb ${activeClass}" src="${url}" onclick="changeMedia('${url}', false, this)">`;
             }).join('');
 
-            // Change Main Display
             changeMedia(mediaUrls[0], String(mediaUrls[0]).toLowerCase().endsWith('.mp4'), thumbContainer.firstElementChild);
         }
 
@@ -226,7 +212,6 @@
 
                 if (!product) { document.getElementById('single-product-container').innerHTML = "<h3>Product not found in database.</h3>"; return; }
 
-                // --- 1. DETERMINE MEDIA & COLORS ---
                 let initialMediaArray = ["https://via.placeholder.com/1080x1920?text=No+Image"];
                 let colorsHtml = '';
 
@@ -234,7 +219,6 @@
                     initialMediaArray = product.colors[0].media.length > 0 ? product.colors[0].media : initialMediaArray;
                     window.currentSelectedColorName = product.colors[0].colorName;
                     
-                    // Save colors to memory so buttons can grab them cleanly
                     window.currentProductColors = product.colors; 
                     
                     colorsHtml = `
@@ -251,12 +235,11 @@
                         </div>
                     `;
                 } else if (product.media && product.media.length > 0) {
-                    initialMediaArray = product.media; // Fallback
+                    initialMediaArray = product.media; 
                 }
                 
                 window.productMediaArray = initialMediaArray;
 
-                // --- 2. BUILD MAIN GALLERY ---
                 const firstMedia = String(initialMediaArray[0]);
                 const isMainVideo = firstMedia.toLowerCase().endsWith('.mp4');
                 let mainMediaHtml = isMainVideo 
@@ -270,7 +253,6 @@
                     return `<img class="thumb ${activeClass}" src="${url}" onclick="changeMedia('${url}', false, this)">`;
                 }).join('');
 
-                // --- 3. BUILD DETAILS ---
                 const safePrice = Number(product.price) || 0;
                 const safeOrig = Number(product.originalPrice) || 0;
                 let priceHtml = (safeOrig > safePrice) ? `<span class="scratched-price">₹${safeOrig.toFixed(2)}</span><span class="selling-price">₹${safePrice.toFixed(2)}</span>` : `<span class="selling-price">₹${safePrice.toFixed(2)}</span>`;
@@ -281,6 +263,22 @@
                 let sizesHtml = `<span style="font-size: 13px; color: #777;">One Size</span>`;
                 if (product.sizes && product.sizes.length > 0) {
                     sizesHtml = product.sizes.map(size => `<button class="selector-btn size-btn" onclick="selectSize(this, '${size}')">${size}</button>`).join('');
+                }
+
+                // FORMAT INSTAGRAM REEL URL
+                let instaHtml = '';
+                if (product.instaReel && product.instaReel.includes('instagram.com/reel/')) {
+                    let cleanUrl = product.instaReel.split('?')[0]; 
+                    if (!cleanUrl.endsWith('/embed') && !cleanUrl.endsWith('/embed/')) {
+                        cleanUrl = cleanUrl.replace(/\/$/, '') + '/embed';
+                    }
+                    
+                    instaHtml = `
+                        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+                            <span class="selector-label" style="text-transform: uppercase; letter-spacing: 1px;">See it on Instagram</span>
+                            <iframe src="${cleanUrl}" width="100%" height="500" frameborder="0" scrolling="no" allowtransparency="true" style="border-radius: 8px; max-width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 15px;"></iframe>
+                        </div>
+                    `;
                 }
 
                 document.getElementById('single-product-container').innerHTML = `
@@ -310,14 +308,14 @@
                         
                         <div class="tabs"><div class="tab active">DESCRIPTION</div></div>
                         <div class="description-content"><p>${(product.description || '').replace(/\n/g, '<br>')}</p></div>
+                        
+                        ${instaHtml} 
                     </div>
                 `;
 
                 startAutoSlide();
                 renderCommentsFeed(product.comments);
 
-                // --- 4. BUILD RELATED ---
-                // Match based on the first category tag if arrays are used
                 const mainCat = (product.categories && product.categories.length > 0) ? product.categories[0] : product.category;
                 const relatedProducts = allProducts.filter(p => p.id != productId && (
                     (p.categories && p.categories.includes(mainCat)) || p.category === mainCat
@@ -345,7 +343,6 @@
             } catch (error) { console.error("Error:", error); }
         }
 
-        // --- COMMENTS LOGIC ---
         function renderCommentsFeed(comments) {
             const feed = document.getElementById('comments-feed');
             if (!comments || comments.length === 0) {
@@ -385,7 +382,6 @@
             } catch(e) { console.error(e); }
         }
 
-        // --- CART LOGIC ---
         let currentSelectedSize = null; 
 
         function selectSize(btn, size) {
@@ -399,12 +395,10 @@
                 alert('Please select a size!'); return false; 
             }
             
-            // Gets the currently displayed main image for the cart
             const currentImage = document.getElementById('main-display').src;
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
             const finalSize = currentSelectedSize || 'One Size';
             
-            // Save color variant name alongside size!
             const fullNameVariant = `${name} (${window.currentSelectedColorName})`;
 
             const cartItem = { id, name: fullNameVariant, price, image: currentImage, size: finalSize, qty };
@@ -437,7 +431,6 @@
         updateCartBadge();
         loadProductPage();
 
-        // Inject Header and Footer
         fetch('header.html').then(r => r.text()).then(d => {
             document.getElementById('header-placeholder').innerHTML = d;
             const s = document.getElementById('header-placeholder').getElementsByTagName('script');

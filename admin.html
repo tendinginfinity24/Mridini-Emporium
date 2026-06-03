@@ -21,7 +21,6 @@
         .order-card { border: 1px solid #ccc; padding: 15px; border-radius: 4px; margin-bottom: 15px; background: #fafafa;}
         .order-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #a35d4d;}
         
-        /* New Colors Section */
         .color-block { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; background: #fdfdfd; border-radius: 4px;}
         .color-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .btn-remove-color { background: #d32f2f; padding: 5px 10px; font-size: 12px; margin: 0; width: auto; }
@@ -83,6 +82,12 @@
                     <textarea id="description" rows="4" placeholder="Fabric details, care instructions, etc..."></textarea>
                 </div>
 
+                <!-- INSTAGRAM REEL LINK -->
+                <div class="form-group">
+                    <label>Instagram Reel Link (Optional)</label>
+                    <input type="text" id="instaReel" placeholder="https://www.instagram.com/reel/...">
+                </div>
+
                 <div class="form-group" style="border: 2px solid #e5ded2; padding: 15px; border-radius: 4px;">
                     <label style="font-size: 16px; color: #a35d4d; border-bottom: 1px solid #e5ded2; padding-bottom: 5px; margin-bottom: 15px;">Color Variants & Media</label>
                     
@@ -115,7 +120,6 @@
     </div>
 
     <script>
-        // --- SECURITY LOCK ---
         const adminPass = prompt("Enter Admin Password:");
         if (!adminPass) {
             window.location.href = "website.html"; 
@@ -131,9 +135,8 @@
         }
 
         let allProducts = [];
-        let colorBlocksData = []; // Holds the state of our colors UI
+        let colorBlocksData = [];
 
-        // --- COLOR UI LOGIC ---
         function generateBlockId() { return Math.random().toString(36).substring(7); }
 
         function addColorBlock(colorName = '', existingMedia = []) {
@@ -196,7 +199,6 @@
             });
         }
 
-        // --- CORE LOGIC ---
         async function fetchProductsForDropdown() {
             try {
                 const response = await fetch('/api/products');
@@ -218,25 +220,24 @@
             const submitBtn = document.getElementById('submit-btn');
             const deleteBtn = document.getElementById('delete-btn');
             
-            colorBlocksData = []; // reset
+            colorBlocksData = []; 
 
             if (selectedId === 'new') {
                 document.getElementById('product-form').reset();
                 submitBtn.innerText = "Upload New Product";
                 deleteBtn.style.display = "none";
-                addColorBlock(); // Add one default block
+                addColorBlock(); 
             } else {
                 const product = allProducts.find(p => p.id == selectedId);
                 document.getElementById('name').value = product.name || '';
-                // Fallback support for old singular category data
                 document.getElementById('categories').value = (product.categories && product.categories.length > 0) ? product.categories.join(', ') : (product.category || '');
                 document.getElementById('originalPrice').value = product.originalPrice || '';
                 document.getElementById('price').value = product.price || '';
                 document.getElementById('description').value = product.description || '';
+                document.getElementById('instaReel').value = product.instaReel || '';
                 document.getElementById('sizes').value = product.sizes ? product.sizes.join(', ') : '';
                 document.getElementById('inStock').checked = product.inStock !== false;
 
-                // Load colors or fallback to old media array
                 if(product.colors && product.colors.length > 0) {
                     product.colors.forEach(c => addColorBlock(c.colorName, [...c.media]));
                 } else if(product.media && product.media.length > 0) {
@@ -265,10 +266,10 @@
                 formData.append('originalPrice', document.getElementById('originalPrice').value);
                 formData.append('price', document.getElementById('price').value);
                 formData.append('description', document.getElementById('description').value);
+                formData.append('instaReel', document.getElementById('instaReel').value);
                 formData.append('sizes', document.getElementById('sizes').value);
                 formData.append('inStock', document.getElementById('inStock').checked);
 
-                // Build Color Data JSON & append files dynamically
                 let colorMeta = [];
                 colorBlocksData.forEach((block, index) => {
                     colorMeta.push({ colorName: block.colorName || 'Standard', existingMedia: block.existingMedia });
@@ -326,7 +327,6 @@
             } catch (error) { alert("Server error."); }
         }
 
-        // --- ORDER MANAGEMENT ---
         async function fetchOrders() {
             try {
                 const response = await fetch('/api/orders');
@@ -387,7 +387,6 @@
             } catch (e) { alert('Failed to update.'); }
         }
 
-        // --- Q&A MANAGEMENT ---
         async function fetchQA() {
             try {
                 const response = await fetch('/api/products');
@@ -398,7 +397,7 @@
                 products.forEach(p => {
                     if (p.comments && p.comments.length > 0) {
                         p.comments.forEach(c => {
-                            if (!c.reply) { // Only show comments without an admin reply
+                            if (!c.reply) { 
                                 qaHtml += `
                                 <div class="order-card" style="margin-bottom:10px;">
                                     <div style="font-size:12px; color:#777;"><strong>Item:</strong> ${p.name} | <strong>User:</strong> ${c.user} | ${new Date(c.createdAt).toLocaleDateString()}</div>
@@ -428,16 +427,15 @@
                 });
                 if(res.ok) {
                     alert('Response posted successfully!');
-                    fetchQA(); // Refresh the list
+                    fetchQA(); 
                 } else { alert('Failed to post reply.'); }
             } catch (e) { alert('Error posting reply.'); }
         }
 
-        // Initialize UI
         fetchProductsForDropdown();
         fetchOrders();
         fetchQA();
-        addColorBlock(); // Add an empty block for "New Product" view
+        addColorBlock(); 
     </script>
 </body>
 </html>
