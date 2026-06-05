@@ -79,11 +79,28 @@ cloudinary.config({
 });
 
 const storage = new CloudinaryStorage({
-    cloudinary: require('cloudinary'),
-    params: {
-        folder: 'zimal_uploads',
-        allowed_formats: ['jpg', 'png', 'jpeg', 'mp4', 'mov', 'webm'],
-        resource_type: 'auto'
+    cloudinary: cloudinary,
+    params: async (req, file) => {
+        // Check if the file is a video
+        if (file.mimetype && file.mimetype.includes('video')) {
+            return {
+                folder: 'zimal_uploads',
+                resource_type: 'video',
+                allowed_formats: ['mp4', 'mov', 'webm']
+            };
+        }
+        
+        // For standard Images: Apply Auto-Resizing and Compression!
+        return {
+            folder: 'zimal_uploads',
+            resource_type: 'image',
+            allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+            // This is the magic line:
+            transformation: [
+                { width: 1080, crop: "limit" }, // Prevents images from being wider than 1080px
+                { quality: "auto", fetch_format: "auto" } // Uses AI to compress without visible quality loss
+            ]
+        };
     }
 });
 const upload = multer({ storage });
@@ -318,6 +335,65 @@ app.post('/api/login', async (req, res) => {
         if (!user || !(await bcrypt.compare(req.body.password, user.password))) return res.status(401).json({ message: "Invalid." });
         res.json({ message: "Login successful!", user });
     } catch (err) { res.status(500).json({ message: "Error" }); }
+});
+
+// ==========================================
+// ONE-TIME MASS IMAGE COMPRESSION ROUTE
+// ==========================================
+app.get('/api/fix-all-images', async (req, res) => {
+    try {
+        const products = await Product.find();
+        let updatedCount = 0;
+
+        // This injects the AI compression rules into the URL
+        const optimize = (url) => {
+            if (url && url.includes('cloudinary.com') && url.includes('/upload/') && !url.includes('q_auto')) {
+                return url.replace('/upload/', '/upload/w_1080,c_limit,q_auto,f_auto/');
+            }
+            return url;
+        };
+
+        for (let p of products) {
+            let changed = false;
+
+            // Update older standard media arrays
+            if (p.media && p.media.length > 0) {
+                const newMedia = p.media.map(optimize);
+                if (newMedia.join() !== p.media.join()) { 
+                    p.media = newMedia; 
+                    changed = true; 
+                }
+            }
+
+            // Update new Color Variant media arrays
+            if (p.colors && p.colors.length > 0) {
+                p.colors.forEach(c => {
+                    if (c.media && c.media.length > 0) {
+                        const newCMedia = c.media.map(optimize);
+                        if (newCMedia.join() !== c.media.join()) { 
+                            c.media = newCMedia; 
+                            changed = true; 
+                        }
+                    }
+                });
+            }
+
+            if (changed) { 
+                await p.save(); 
+                updatedCount++; 
+            }
+        }
+        
+        res.send(`
+            <div style="font-family: sans-serif; text-align: center; margin-top: 50px;">
+                <h1 style="color: green;">🎉 Success!</h1>
+                <h3>Successfully injected AI compression into ${updatedCount} products!</h3>
+                <p>Your database is completely updated. Your live site will now load incredibly fast.</p>
+            </div>
+        `);
+    } catch(e) { 
+        res.send("Error: " + e.message); 
+    }
 });
 
 const PORT = process.env.PORT || 8080;
