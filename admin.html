@@ -300,12 +300,19 @@
                     }
                     await fetchProductsForDropdown();
                     if (selectedMode !== 'new') document.getElementById('mode-select').dispatchEvent(new Event('change'));
-                } else throw new Error();
+                } else {
+                    // This extracts the exact text from Cloudinary or the Database!
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.details || errData.message || 'Server rejected the upload');
+                }
             } catch (error) {
-                statusMsg.innerText = "Error saving product. Check server terminal.";
+                // Prints the exact reason onto your screen in red
+                statusMsg.innerText = "❌ " + error.message;
                 statusMsg.style.color = "red";
             }
-            setTimeout(() => statusMsg.innerText = "", 4000);
+            
+            // Keeps the error on screen so you have time to read it
+            setTimeout(() => { if(statusMsg.style.color !== "red") statusMsg.innerText = ""; }, 4000);
         });
 
         async function deleteProduct() {

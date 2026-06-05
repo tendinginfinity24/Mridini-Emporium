@@ -124,6 +124,10 @@ app.post('/api/verify-admin', (req, res) => {
 // PRODUCT ROUTES
 // ==================
 
+// ==================
+// PRODUCT ROUTES
+// ==================
+
 app.get('/api/products', async (req, res) => {
     try {
         const products = await Product.find();
@@ -149,7 +153,20 @@ const processColorData = (req) => {
     return parsedColors;
 };
 
-app.post('/api/upload', adminAuth, upload.any(), async (req, res) => {
+// NEW: Cloudinary Error Interceptor
+const uploadMiddleware = (req, res, next) => {
+    const uploader = upload.any();
+    uploader(req, res, function (err) {
+        if (err) {
+            console.error("❌ CLOUDINARY UPLOAD ERROR:", err);
+            return res.status(500).json({ message: "Cloudinary Error", details: err.message || JSON.stringify(err) });
+        }
+        next();
+    });
+};
+
+// Protected Upload Route
+app.post('/api/upload', adminAuth, uploadMiddleware, async (req, res) => {
     try {
         const { name, categories, originalPrice, price, description, sizes, inStock, instaReel } = req.body;
         
@@ -175,12 +192,13 @@ app.post('/api/upload', adminAuth, upload.any(), async (req, res) => {
         await newProduct.save();
         res.json({ message: "Product uploaded successfully!", product: newProduct });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Error uploading product." });
+        console.error("❌ DATABASE CRASH:", error);
+        res.status(500).json({ message: "Database Error", details: error.message || JSON.stringify(error) });
     }
 });
 
-app.put('/api/products/:id', adminAuth, upload.any(), async (req, res) => {
+// Protected Update Route
+app.put('/api/products/:id', adminAuth, uploadMiddleware, async (req, res) => {
     try {
         const productId = parseInt(req.params.id);
         const existingProduct = await Product.findOne({ id: productId });
@@ -205,12 +223,12 @@ app.put('/api/products/:id', adminAuth, upload.any(), async (req, res) => {
                 description: req.body.description, 
                 sizes: req.body.sizes ? req.body.sizes.split(',').map(s=>s.trim()) : existingProduct.sizes
             },
-            { returnDocument: 'after' } // Fixed Mongoose Deprecation Warning
+            { returnDocument: 'after' } 
         );
         res.json({ message: "Product updated!", product: updated });
-    } catch (err) { 
-        console.error(err);
-        res.status(500).json({ message: "Error updating product." }); 
+    } catch (error) { 
+        console.error("❌ DATABASE CRASH:", error);
+        res.status(500).json({ message: "Database Error", details: error.message || JSON.stringify(error) }); 
     }
 });
 
