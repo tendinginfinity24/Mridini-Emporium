@@ -39,7 +39,7 @@ const productSchema = new mongoose.Schema({
     media: [String], 
     colors: [ColorVariantSchema], 
     comments: [CommentSchema], 
-    instaReel: String, // Added Instagram Reel Support
+    instaReel: String, 
     inStock: Boolean
 });
 const Product = mongoose.model('Product', productSchema);
@@ -81,7 +81,6 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
-        // Check if the file is a video
         if (file.mimetype && file.mimetype.includes('video')) {
             return {
                 folder: 'zimal_uploads',
@@ -90,20 +89,25 @@ const storage = new CloudinaryStorage({
             };
         }
         
-        // For standard Images: Apply Auto-Resizing and Compression!
         return {
             folder: 'zimal_uploads',
             resource_type: 'image',
             allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
-            // This is the magic line:
             transformation: [
-                { width: 1080, crop: "limit" }, // Prevents images from being wider than 1080px
-                { quality: "auto", fetch_format: "auto" } // Uses AI to compress without visible quality loss
+                { width: 1080, crop: "limit" }, 
+                { quality: "auto", fetch_format: "auto" } 
             ]
         };
     }
 });
-const upload = multer({ storage });
+
+const upload = multer({
+    storage,
+    limits: {
+        fileSize: 50 * 1024 * 1024,  // 50MB max per file
+        files: 20                     // max 20 files per request
+    }
+});
 
 // --- APP SETUP ---
 const app = express();
@@ -141,10 +145,6 @@ app.post('/api/verify-admin', (req, res) => {
 // PRODUCT ROUTES
 // ==================
 
-// ==================
-// PRODUCT ROUTES
-// ==================
-
 app.get('/api/products', async (req, res) => {
     try {
         const products = await Product.find();
@@ -170,20 +170,31 @@ const processColorData = (req) => {
     return parsedColors;
 };
 
-// NEW: Cloudinary Error Interceptor
+// Extend timeout for upload routes (5 minutes)
+const uploadTimeout = (req, res, next) => {
+    req.setTimeout(5 * 60 * 1000);
+    res.setTimeout(5 * 60 * 1000);
+    next();
+};
+
 const uploadMiddleware = (req, res, next) => {
     const uploader = upload.any();
     uploader(req, res, function (err) {
         if (err) {
             console.error("❌ CLOUDINARY UPLOAD ERROR:", err);
-            return res.status(500).json({ message: "Cloudinary Error", details: err.message || JSON.stringify(err) });
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                return res.status(400).json({ message: "File too large. Max size is 50MB per file." });
+            }
+            if (err.code === 'LIMIT_FILE_COUNT') {
+                return res.status(400).json({ message: "Too many files. Max 20 files per upload." });
+            }
+            return res.status(500).json({ message: "Upload Error", details: err.message || JSON.stringify(err) });
         }
         next();
     });
 };
 
-// Protected Upload Route
-app.post('/api/upload', adminAuth, uploadMiddleware, async (req, res) => {
+app.post('/api/upload', adminAuth, uploadTimeout, uploadMiddleware, async (req, res) => {
     try {
         const { name, categories, originalPrice, price, description, sizes, inStock, instaReel } = req.body;
         
@@ -214,8 +225,7 @@ app.post('/api/upload', adminAuth, uploadMiddleware, async (req, res) => {
     }
 });
 
-// Protected Update Route
-app.put('/api/products/:id', adminAuth, uploadMiddleware, async (req, res) => {
+app.put('/api/products/:id', adminAuth, uploadTimeout, uploadMiddleware, async (req, res) => {
     try {
         const productId = parseInt(req.params.id);
         const existingProduct = await Product.findOne({ id: productId });
@@ -337,66 +347,11 @@ app.post('/api/login', async (req, res) => {
     } catch (err) { res.status(500).json({ message: "Error" }); }
 });
 
-// ==========================================
-// ONE-TIME MASS IMAGE COMPRESSION ROUTE
-// ==========================================
-app.get('/api/fix-all-images', async (req, res) => {
-    try {
-        const products = await Product.find();
-        let updatedCount = 0;
-
-        // This injects the AI compression rules into the URL
-        const optimize = (url) => {
-            if (url && url.includes('cloudinary.com') && url.includes('/upload/') && !url.includes('q_auto')) {
-                return url.replace('/upload/', '/upload/w_1080,c_limit,q_auto,f_auto/');
-            }
-            return url;
-        };
-
-        for (let p of products) {
-            let changed = false;
-
-            // Update older standard media arrays
-            if (p.media && p.media.length > 0) {
-                const newMedia = p.media.map(optimize);
-                if (newMedia.join() !== p.media.join()) { 
-                    p.media = newMedia; 
-                    changed = true; 
-                }
-            }
-
-            // Update new Color Variant media arrays
-            if (p.colors && p.colors.length > 0) {
-                p.colors.forEach(c => {
-                    if (c.media && c.media.length > 0) {
-                        const newCMedia = c.media.map(optimize);
-                        if (newCMedia.join() !== c.media.join()) { 
-                            c.media = newCMedia; 
-                            changed = true; 
-                        }
-                    }
-                });
-            }
-
-            if (changed) { 
-                await p.save(); 
-                updatedCount++; 
-            }
-        }
-        
-        res.send(`
-            <div style="font-family: sans-serif; text-align: center; margin-top: 50px;">
-                <h1 style="color: green;">🎉 Success!</h1>
-                <h3>Successfully injected AI compression into ${updatedCount} products!</h3>
-                <p>Your database is completely updated. Your live site will now load incredibly fast.</p>
-            </div>
-        `);
-    } catch(e) { 
-        res.send("Error: " + e.message); 
-    }
-});
-
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+// Disable Node's core timeouts for massive AI uploads
+server.timeout = 0;
+server.keepAliveTimeout = 0;
